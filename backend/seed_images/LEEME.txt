@@ -1,0 +1,17 @@
+Pon aquí las fotos de los platillos.
+
+Nombra cada archivo como el platillo (no importan acentos/mayúsculas/espacios):
+  Cappuccino.jpg
+  desayuno-canela.png
+  Cheesecake de frutos rojos.jpg
+
+Platillos del menú (nómbralas igual para que hagan match):
+  Paquetes: Desayuno Canela, Café & Postre, Brunch para compartir
+  Desayunos: Tostada de aguacate, Chilaquiles verdes, Hotcakes de avena, Bowl de yogurt
+  Comidas: Sándwich de pollo, Panini caprese, Ensalada de la casa, Quiche de espinaca
+  Café & calientes: Espresso, Cappuccino, Latte de vainilla, Chocolate caliente, Té chai
+  Bebidas frías: Iced latte, Limonada de menta, Frappé de caramelo, Matcha frío
+  Postres: Cheesecake de frutos rojos, Tarta de chocolate, Pay de limón, Rebanada de zanahoria, Tiramisú
+
+Luego corre:
+  docker compose exec backend python manage.py seed_fotos --slug prueba --dir seed_images

@@ -1,0 +1,56 @@
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_NAME:-vitrina}
+      POSTGRES_USER: ${DB_USER:-vitrina}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-vitrina}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-vitrina}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  backend:
+    build: ./backend
+    restart: unless-stopped
+    environment:
+      DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY:-dev-insecure-change-me}
+      DJANGO_DEBUG: ${DJANGO_DEBUG:-True}
+      DJANGO_ALLOWED_HOSTS: ${DJANGO_ALLOWED_HOSTS:-*}
+      DB_ENGINE: postgres
+      DB_NAME: ${DB_NAME:-vitrina}
+      DB_USER: ${DB_USER:-vitrina}
+      DB_PASSWORD: ${DB_PASSWORD:-vitrina}
+      DB_HOST: db
+      DB_PORT: "5432"
+    volumes:
+      - ./backend:/app
+    ports:
+      - "8001:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  frontend:
+    build: ./frontend
+    restart: unless-stopped
+    # Reinstala dependencias al arrancar para que cambios en package.json
+    # (nuevas librerías) se reflejen sin tener que recrear el volumen.
+    command: sh -c "npm install && npm run dev -- --host 0.0.0.0"
+    environment:
+      VITE_API_URL: ${VITE_API_URL:-http://localhost:8001/api}
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    ports:
+      # Host 5180 -> contenedor 5173 (5173 lo usa otro proyecto local).
+      - "5180:5173"
+    depends_on:
+      - backend
+
+volumes:
+  pgdata:
