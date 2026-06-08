@@ -7,6 +7,7 @@ base de datos PostgreSQL. Todo corre en contenedores con un solo comando.
 AgencySoftware/
 ├── backend/          API Django + DRF (multi-tenant, arquitectura limpia)
 ├── frontend/         Panel React + TypeScript (Vite)
+├── docs/             Documentación del proyecto
 ├── docker-compose.yml
 └── .env.example
 ```
@@ -32,7 +33,7 @@ Esto levanta tres servicios:
 
 El backend corre las migraciones solo al iniciar.
 
-## Primer uso (Módulo 0)
+## Primer uso
 
 1. Abre http://localhost:5180
 2. Clic en **“¿No tienes cuenta? Crea tu negocio”** y regístrate
@@ -45,10 +46,17 @@ Para un superusuario del admin de Django:
 docker compose exec backend python manage.py createsuperuser
 ```
 
+## Documentación
+
+La documentación completa está en [`docs/`](docs/README.md): arquitectura, referencia
+de la API, y guías del panel del dueño, de la vitrina pública y del panel de plataforma.
+
 ## Estado
 
-- **Módulo 0 (este):** cimientos. Docker + Postgres + login conectado por JWT.
-- **Módulo 1 (siguiente):** editor de menú del panel + branding.
+Producto funcional con: panel del dueño (menú, **catálogo**, marca, QR, cocina,
+**pedidos**, métricas), vitrina pública por QR con **multi-idioma ES/EN** y **modo
+tienda**, y panel **super-admin** de plataforma (negocios, planes, módulos/add-ons).
+Pendiente: pago en línea real, métricas con eventos reales y despliegue a producción.
 
 ## Notas
 
