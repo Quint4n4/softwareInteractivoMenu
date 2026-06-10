@@ -3,7 +3,7 @@ import { useState } from "react";
 import { deleteLogo, patchBranding, uploadLogo } from "../api/branding";
 import { mediaUrl } from "../api/client";
 import Icon from "../ui/Icon";
-import { FONTS, PALETTES } from "../ui/brandOptions";
+import { PALETTES } from "../ui/brandOptions";
 import type { Brand } from "./Panel";
 
 export default function Branding({
@@ -134,26 +134,6 @@ export default function Branding({
             );
           })}
         </div>
-      </section>
-
-      <section className="card panelcard">
-        <h3 className="panelcard__h"><Icon name="type" size={17} /> Tipografía de títulos</h3>
-        <div className="row wrap" style={{ gap: 9 }}>
-          {Object.entries(FONTS).map(([name, family]) => {
-            const on = brand.fontLabel === name;
-            return (
-              <button
-                key={name}
-                className={"fontopt" + (on ? " is-on" : "")}
-                onClick={() => setBrand({ ...brand, fontLabel: name })}
-              >
-                <span style={{ fontFamily: family, fontSize: 22, fontWeight: 800, lineHeight: 1 }}>Aa</span>
-                <span style={{ fontSize: 12, fontWeight: 700 }}>{name}</span>
-              </button>
-            );
-          })}
-        </div>
-        <div className="fhint" style={{ marginTop: 10 }}>Los cambios se ven al instante en la vista previa →</div>
       </section>
 
       <section className="card panelcard">

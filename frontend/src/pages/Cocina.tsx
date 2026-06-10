@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useState } from "react";
 
 import { listPedidos, type Pedido, setPedidoEstado } from "../api/orders";
+import Icon from "../ui/Icon";
+import { printTicket, waTicketUrl } from "../ui/ticket";
 
 type Col = { estado: string; label: string; cls: string; next: string | null; action: string | null };
 
@@ -20,7 +22,7 @@ const PEDIDOS_COLS: Col[] = [
   { estado: "entregado", label: "Entregado", cls: "st-done", next: null, action: null },
 ];
 
-export default function Cocina({ kind = "cocina" }: { kind?: "cocina" | "pedidos" }) {
+export default function Cocina({ kind = "cocina", negocio }: { kind?: "cocina" | "pedidos"; negocio: string }) {
   const [pedidos, setPedidos] = useState<Pedido[]>([]);
   const [error, setError] = useState<string | null>(null);
 
@@ -41,6 +43,17 @@ export default function Cocina({ kind = "cocina" }: { kind?: "cocina" | "pedidos
     load();
   }
 
+  // Libera una mesa: cierra (entrega) todos sus pedidos activos para que quede libre.
+  async function liberarMesa(mesa: string) {
+    const activos = pedidos.filter(
+      (p) => p.tipo === "mesa" && p.mesa_texto === mesa && p.estado !== "entregado" && p.estado !== "cancelado",
+    );
+    if (!activos.length) return;
+    if (!window.confirm(`¿Liberar Mesa ${mesa}? Se cerrarán ${activos.length} pedido(s) y la mesa quedará libre.`)) return;
+    await Promise.all(activos.map((p) => setPedidoEstado(p.id, "entregado")));
+    load();
+  }
+
   if (error) return <div className="error">{error}</div>;
 
   const cols = kind === "pedidos" ? PEDIDOS_COLS : COCINA_COLS;
@@ -48,9 +61,29 @@ export default function Cocina({ kind = "cocina" }: { kind?: "cocina" | "pedidos
   const visibles = pedidos.filter((p) =>
     kind === "pedidos" ? p.origen !== "menu" : p.origen !== "catalogo",
   );
+  // Mesas con pedidos activos (para poder liberarlas).
+  const mesasOcupadas = [
+    ...new Set(
+      pedidos
+        .filter((p) => p.tipo === "mesa" && p.estado !== "entregado" && p.estado !== "cancelado")
+        .map((p) => p.mesa_texto)
+        .filter(Boolean),
+    ),
+  ];
 
   return (
-    <div className="kds">
+    <>
+      {kind === "cocina" && mesasOcupadas.length > 0 && (
+        <div className="mesas-bar">
+          <span className="mute2" style={{ fontSize: 12, fontWeight: 800 }}>Mesas ocupadas:</span>
+          {mesasOcupadas.map((m) => (
+            <button key={m} className="mesa-chip" onClick={() => liberarMesa(m)} title={`Liberar Mesa ${m}`}>
+              Mesa {m} <Icon name="x" size={12} />
+            </button>
+          ))}
+        </div>
+      )}
+      <div className="kds">
       {cols.map((col) => {
         const items = visibles.filter((p) => p.estado === col.estado);
         return (
@@ -84,11 +117,25 @@ export default function Cocina({ kind = "cocina" }: { kind?: "cocina" | "pedidos
                     {col.action}
                   </button>
                 )}
+                <div className="row" style={{ gap: 6, marginTop: 8 }}>
+                  <button className="btn btn--ghost btn--sm grow" onClick={() => printTicket(p, negocio)} title="Imprimir / PDF">
+                    <Icon name="receipt" size={13} /> Ticket
+                  </button>
+                  <button
+                    className="btn btn--wa btn--sm grow"
+                    disabled={!p.telefono}
+                    onClick={() => p.telefono && window.open(waTicketUrl(p, negocio, p.telefono), "_blank")}
+                    title={p.telefono ? `Enviar a ${p.telefono}` : "Sin teléfono"}
+                  >
+                    <Icon name="chat" size={13} /> WhatsApp
+                  </button>
+                </div>
               </div>
             ))}
           </div>
         );
       })}
-    </div>
+      </div>
+    </>
   );
 }

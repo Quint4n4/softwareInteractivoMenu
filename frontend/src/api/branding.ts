@@ -16,6 +16,7 @@ export interface NegocioBrand {
   modo_vitrina: string;
   idioma_default: string;
   idiomas: string[];
+  num_mesas: number;
 }
 
 export interface Branding {

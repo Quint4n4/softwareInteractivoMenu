@@ -34,8 +34,8 @@
   --radius:      16px;
   --radius-sm:   11px;
 
-  --font-display: 'Playfair Display', Georgia, serif;
-  --font-body:    'Nunito Sans', system-ui, -apple-system, sans-serif;
+  --font-display: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --font-body:    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
 
   --shadow-sm: 0 2px 8px -5px rgba(46,36,32,0.28);
   --shadow:    0 8px 24px -16px rgba(46,36,32,0.34);
@@ -118,6 +118,16 @@ button { font-family: inherit; }
 .btn--danger:hover { background: #FCF1F0; }
 .btn--sm { padding: 8px 13px; font-size: 13px; }
 .btn--block { width: 100%; }
+.btn--wa { background: #25d366; color: #fff; }
+.btn--wa:hover { filter: brightness(0.93); }
+.venta-row { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; padding: 12px 14px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); }
+.mesas-bar { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-bottom: 14px; }
+.mesa-chip { display: inline-flex; align-items: center; gap: 5px; background: var(--accent-soft); color: var(--accent); border: 1px solid var(--line); border-radius: 999px; padding: 6px 12px; font-weight: 800; font-size: 12.5px; cursor: pointer; }
+.mesa-chip:hover { filter: brightness(0.97); }
+.mesa-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
+.mesa-card { border: 1px solid var(--line); border-radius: 12px; padding: 12px; text-align: center; display: flex; flex-direction: column; gap: 8px; align-items: center; }
+.mesa-card__num { font-weight: 800; font-size: 13.5px; }
+.mesa-card__qr { width: 100%; max-width: 130px; border-radius: 8px; }
 .btn:disabled { opacity: 0.45; cursor: default; box-shadow: none; }
 
 .iconbtn {

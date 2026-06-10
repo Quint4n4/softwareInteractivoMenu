@@ -32,6 +32,7 @@ class Pedido(TenantModel):
 
     numero = models.CharField(max_length=12, blank=True, default="")
     nombre_cliente = models.CharField(max_length=120, default="")
+    telefono = models.CharField(max_length=20, blank=True, default="", help_text="WhatsApp del cliente para enviarle el ticket")
     tipo = models.CharField(max_length=10, choices=Tipo.choices, default=Tipo.MESA)
     mesa_texto = models.CharField(max_length=20, blank=True, default="", help_text="Número de mesa")
     mesa = models.ForeignKey(Mesa, on_delete=models.SET_NULL, null=True, blank=True)

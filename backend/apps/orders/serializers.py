@@ -13,6 +13,7 @@ class PedidoLineaInput(serializers.Serializer):
 
 class PedidoCreateInput(serializers.Serializer):
     nombre_cliente = serializers.CharField(max_length=120)
+    telefono = serializers.CharField(max_length=20, required=False, allow_blank=True, default="")
     tipo = serializers.ChoiceField(choices=Pedido.Tipo.choices, default=Pedido.Tipo.MESA)
     mesa_texto = serializers.CharField(max_length=20, required=False, allow_blank=True, default="")
     nota = serializers.CharField(max_length=200, required=False, allow_blank=True, default="")
@@ -44,7 +45,7 @@ class PedidoOutput(serializers.ModelSerializer):
     class Meta:
         model = Pedido
         fields = (
-            "id", "numero", "nombre_cliente", "tipo", "mesa_texto", "nota",
+            "id", "numero", "nombre_cliente", "telefono", "tipo", "mesa_texto", "nota",
             "metodo_pago", "metodo_pago_label", "estado", "estado_label",
             "subtotal", "propina", "total", "creado", "origen", "lineas",
         )

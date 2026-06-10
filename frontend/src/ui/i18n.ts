@@ -49,6 +49,7 @@ export interface UIStrings {
   heroTag: string;
   seeMenu: string;
   tapCategory: string;
+  chooseTitle: string;
   startHere: string;
   favorites: string;
   menu: string;
@@ -108,6 +109,15 @@ export interface UIStrings {
   paidCard: string;
   paidCash: string;
   orderAgain: string;
+  ticketBtn: string;
+  whatsappSend: string;
+  whatsappPhone: string;
+  whatsappPhonePh: string;
+  thanks: string;
+  downloadPdf: string;
+  willSendWhatsapp: string;
+  ticketNoPhone: string;
+  phoneOptional: string;
   noActiveOrders: string;
   noActiveOrdersNote: string;
   tabs: { home: string; menu: string; cart: string; order: string };
@@ -121,6 +131,7 @@ const ES: UIStrings = {
   heroTag: "Escanea, explora nuestro menú y disfruta. 🍰",
   seeMenu: "Ver el menú",
   tapCategory: "Toca una categoría para ir directo.",
+  chooseTitle: "¿Qué se te antoja?",
   startHere: "Empieza aquí",
   favorites: "Favoritos",
   menu: "Menú",
@@ -133,7 +144,7 @@ const ES: UIStrings = {
   emptyMenu: "Este menú aún no tiene platillos.",
   bundle: "Paquete",
   includes: "Incluye",
-  addToCart: "Agregar al carrito",
+  addToCart: "Agregar a la orden",
   addAnother: "Agregar otro",
   hi: "¡Hola!",
   welcomeNote: "Un par de datos para preparar tu experiencia.",
@@ -146,9 +157,9 @@ const ES: UIStrings = {
   yourNamePh: "Tu nombre",
   tableNumber: "Número de mesa",
   tablePh: "Ej. 12",
-  cartEmpty: "Tu carrito está vacío",
+  cartEmpty: "Tu orden está vacía",
   cartEmptyNote: "Agrega platillos desde el menú.",
-  yourCart: "Tu carrito",
+  yourCart: "Tu orden",
   table: "Mesa",
   each: "c/u",
   kitchenNotes: "Notas para la cocina",
@@ -180,9 +191,18 @@ const ES: UIStrings = {
   paidCard: "Pagado con tarjeta",
   paidCash: "Pago en efectivo",
   orderAgain: "Hacer otro pedido",
+  ticketBtn: "Ver / enviar ticket",
+  whatsappSend: "Enviar por WhatsApp",
+  whatsappPhone: "Tu número de WhatsApp",
+  whatsappPhonePh: "Ej. 55 1234 5678",
+  thanks: "¡Gracias por tu compra!",
+  downloadPdf: "Imprimir / Descargar PDF",
+  willSendWhatsapp: "Te enviaremos tu ticket por WhatsApp ✓",
+  ticketNoPhone: "Para recibir tu ticket, deja tu WhatsApp al ordenar.",
+  phoneOptional: "Opcional — te enviaremos tu ticket por aquí.",
   noActiveOrders: "Sin pedidos activos",
   noActiveOrdersNote: "Cuando hagas un pedido, aquí podrás seguirlo.",
-  tabs: { home: "Inicio", menu: "Menú", cart: "Carrito", order: "Pedido" },
+  tabs: { home: "Inicio", menu: "Menú", cart: "Orden", order: "Pedido" },
   steps: {
     nuevo: { label: "Pedido recibido", sub: "Confirmamos tu pedido" },
     en_proceso: { label: "En preparación", sub: "Manos a la obra" },
@@ -198,6 +218,7 @@ const EN: UIStrings = {
   heroTag: "Scan, explore our menu and enjoy. 🍰",
   seeMenu: "See the menu",
   tapCategory: "Tap a category to jump right in.",
+  chooseTitle: "What are you craving?",
   startHere: "Start here",
   favorites: "Favorites",
   menu: "Menu",
@@ -210,7 +231,7 @@ const EN: UIStrings = {
   emptyMenu: "This menu has no dishes yet.",
   bundle: "Bundle",
   includes: "Includes",
-  addToCart: "Add to cart",
+  addToCart: "Add to order",
   addAnother: "Add another",
   hi: "Hi there!",
   welcomeNote: "A couple of details to set up your experience.",
@@ -223,9 +244,9 @@ const EN: UIStrings = {
   yourNamePh: "Your name",
   tableNumber: "Table number",
   tablePh: "e.g. 12",
-  cartEmpty: "Your cart is empty",
+  cartEmpty: "Your order is empty",
   cartEmptyNote: "Add dishes from the menu.",
-  yourCart: "Your cart",
+  yourCart: "Your order",
   table: "Table",
   each: "ea.",
   kitchenNotes: "Notes for the kitchen",
@@ -257,9 +278,18 @@ const EN: UIStrings = {
   paidCard: "Paid by card",
   paidCash: "Cash payment",
   orderAgain: "Order again",
+  ticketBtn: "View / send ticket",
+  whatsappSend: "Send via WhatsApp",
+  whatsappPhone: "Your WhatsApp number",
+  whatsappPhonePh: "e.g. 55 1234 5678",
+  thanks: "Thanks for your order!",
+  downloadPdf: "Print / Download PDF",
+  willSendWhatsapp: "We'll send your ticket via WhatsApp ✓",
+  ticketNoPhone: "To get your ticket, leave your WhatsApp when ordering.",
+  phoneOptional: "Optional — we'll send your ticket here.",
   noActiveOrders: "No active orders",
   noActiveOrdersNote: "When you place an order, you can track it here.",
-  tabs: { home: "Home", menu: "Menu", cart: "Cart", order: "Order" },
+  tabs: { home: "Home", menu: "Menu", cart: "Order", order: "Track" },
   steps: {
     nuevo: { label: "Order received", sub: "We confirmed your order" },
     en_proceso: { label: "Preparing", sub: "On it!" },

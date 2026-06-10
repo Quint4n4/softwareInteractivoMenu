@@ -22,6 +22,7 @@ const P: Record<string, ReactNode> = {
   x: <path d="M6 6l12 12M18 6L6 18" />,
   alert: <g><path d="M12 3 2 20h20z" /><path d="M12 10v4M12 17h.01" /></g>,
   box: <g><path d="M3 7.5 12 3l9 4.5v9L12 21l-9-4.5z" /><path d="M3 7.5 12 12l9-4.5M12 12v9" /></g>,
+  clipboard: <g><rect x="5" y="5" width="14" height="16" rx="2.5" /><path d="M9 5V4.3A1.6 1.6 0 0 1 10.6 3h2.8A1.6 1.6 0 0 1 15 4.3V5M9 11h6M9 15h4" /></g>,
   qr: <g><rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="3" width="7" height="7" rx="1" /><rect x="3" y="14" width="7" height="7" rx="1" /><path d="M14 14h3v3M20 14v.01M17 20v.01M20 17v3" /></g>,
   user: <g><circle cx="12" cy="8" r="4" /><path d="M4 21c0-4 3.5-6 8-6s8 2 8 6" /></g>,
   chevron: <path d="M9 5l7 7-7 7" />,
@@ -35,6 +36,7 @@ const P: Record<string, ReactNode> = {
   globe: <g><circle cx="12" cy="12" r="9" /><path d="M3 12h18M12 3c2.5 2.6 3.6 5.7 3.6 9s-1.1 6.4-3.6 9c-2.5-2.6-3.6-5.7-3.6-9s1.1-6.4 3.6-9z" /></g>,
   card: <g><rect x="2.5" y="5" width="19" height="14" rx="3" /><path d="M2.5 9.5h19M6 15h4" /></g>,
   cash: <g><rect x="2.5" y="6" width="19" height="12" rx="2.5" /><circle cx="12" cy="12" r="2.6" /><path d="M6 9.5h.01M18 14.5h.01" /></g>,
+  chat: <path d="M4 5h16a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H9l-4 4v-4H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z" />,
 };
 
 export default function Icon({

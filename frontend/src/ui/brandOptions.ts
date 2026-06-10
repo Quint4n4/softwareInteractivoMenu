@@ -1,13 +1,14 @@
-// Paletas y tipografías (tomadas del prototipo). El valor guardado en el Tema
-// es el HEX del color y el nombre de la tipografía.
+// Paletas de color (vivas, inspiradas en comida) y tipografías. El valor
+// guardado en el Tema es el HEX del color y el nombre de la tipografía.
 export const PALETTES: Record<string, string> = {
-  Café: "#6F4A35",
-  Terracota: "#B95C3C",
-  Olivo: "#6E7A3F",
-  Ocre: "#BE8A2E",
-  Vino: "#9B3B52",
-  Azul: "#3E6E8E",
-  Lavanda: "#6F5E9B",
+  Tomate: "#E03A2E",
+  Mandarina: "#E8651B",
+  Mango: "#E89308",
+  Aguacate: "#569E2C",
+  Pistache: "#12A06A",
+  Fresa: "#E03A6B",
+  Mora: "#7A45C4",
+  Arándano: "#356FD6",
 };
 
 export const FONTS: Record<string, string> = {

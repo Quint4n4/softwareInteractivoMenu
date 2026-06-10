@@ -73,6 +73,7 @@ export interface Pedido {
   id: number;
   numero: string;
   nombre_cliente: string;
+  telefono: string;
   tipo: string;
   mesa_texto: string;
   nota: string;
@@ -89,6 +90,7 @@ export interface Pedido {
 }
 export interface PedidoCreate {
   nombre_cliente: string;
+  telefono?: string;
   tipo: string;
   mesa_texto?: string;
   nota?: string;

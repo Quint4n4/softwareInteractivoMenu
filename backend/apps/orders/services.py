@@ -20,7 +20,7 @@ def _generar_numero(tenant: Tenant) -> str:
 
 @transaction.atomic
 def pedido_create(
-    *, tenant: Tenant, nombre_cliente: str, tipo: str = Pedido.Tipo.MESA,
+    *, tenant: Tenant, nombre_cliente: str, telefono: str = "", tipo: str = Pedido.Tipo.MESA,
     mesa_texto: str = "", nota: str = "", metodo_pago: str = Pedido.MetodoPago.EFECTIVO,
     propina: Decimal | None = None, items: list[dict[str, Any]],
 ) -> Pedido:
@@ -54,7 +54,7 @@ def pedido_create(
         raise ValidationError("La propina no puede ser negativa.")
 
     pedido = Pedido.objects.create(
-        tenant=tenant, nombre_cliente=nombre_cliente, tipo=tipo,
+        tenant=tenant, nombre_cliente=nombre_cliente, telefono=telefono, tipo=tipo,
         mesa_texto=mesa_texto, nota=nota, metodo_pago=metodo_pago,
         subtotal=total, propina=prop, total=total + prop,
         numero=_generar_numero(tenant),

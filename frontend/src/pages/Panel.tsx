@@ -18,6 +18,8 @@ import Branding from "./Branding";
 import Cocina from "./Cocina";
 import MenuEditor from "./MenuEditor";
 import Metrics from "./Metrics";
+import Ventas from "./Ventas";
+import Mesas from "./Mesas";
 import QRView from "./QRView";
 
 export interface Brand {
@@ -27,9 +29,10 @@ export interface Brand {
   fontLabel: string;
   logoUrl: string | null;
   idiomas: string[];
+  num_mesas: number;
 }
 
-type Section = "menu" | "catalogo" | "brand" | "qr" | "cocina" | "pedidos" | "metrics";
+type Section = "menu" | "catalogo" | "brand" | "qr" | "mesas" | "cocina" | "pedidos" | "ventas" | "metrics";
 
 export default function Panel({ me, onLogout }: { me: Me; onLogout: () => void }) {
   const [section, setSection] = useState<Section>("menu");
@@ -39,10 +42,11 @@ export default function Panel({ me, onLogout }: { me: Me; onLogout: () => void }
   const [brand, setBrand] = useState<Brand>({
     nombre: me.tenant?.nombre ?? "Mi negocio",
     modo: me.tenant?.modo_vitrina ?? "menu",
-    accentHex: PALETTES["Café"],
+    accentHex: PALETTES["Tomate"],
     fontLabel: "Editorial",
     logoUrl: null,
     idiomas: [],
+    num_mesas: 0,
   });
 
   const [menuCol, setMenuCol] = useState<Coleccion | null>(null);
@@ -74,10 +78,11 @@ export default function Panel({ me, onLogout }: { me: Me; onLogout: () => void }
         setBrand({
           nombre: b.negocio.nombre,
           modo: b.negocio.modo_vitrina,
-          accentHex: b.tema.color_primario || PALETTES["Café"],
+          accentHex: b.tema.color_primario || PALETTES["Tomate"],
           fontLabel: b.tema.tipografia || "Editorial",
           logoUrl: b.tema.logo,
           idiomas: b.negocio.idiomas ?? [],
+          num_mesas: b.negocio.num_mesas ?? 0,
         }),
       )
       .catch(() => undefined);
@@ -102,8 +107,10 @@ export default function Panel({ me, onLogout }: { me: Me; onLogout: () => void }
       { id: "catalogo", label: "Catálogo", icon: "box" },
       { id: "brand", label: "Marca", icon: "palette" },
       { id: "qr", label: "QR", icon: "qr" },
+      { id: "mesas", label: "Mesas", icon: "grip" },
       { id: "cocina", label: "Cocina", icon: "bell" },
       { id: "pedidos", label: "Pedidos", icon: "receipt" },
+      { id: "ventas", label: "Ventas", icon: "cash" },
       { id: "metrics", label: "Métricas", icon: "chart" },
     ] as { id: Section; label: string; icon: string }[]
   ).filter((n) => (n.id !== "catalogo" && n.id !== "pedidos") || catalogActive);
@@ -113,8 +120,10 @@ export default function Panel({ me, onLogout }: { me: Me; onLogout: () => void }
     catalogo: "Editor de catálogo",
     brand: "Marca y apariencia",
     qr: "Código QR",
+    mesas: "Mesas y QR por mesa",
     cocina: "Cocina",
     pedidos: "Pedidos del catálogo",
+    ventas: "Ventas",
     metrics: "Métricas",
   }[section];
   const sectionSub = {
@@ -122,8 +131,10 @@ export default function Panel({ me, onLogout }: { me: Me; onLogout: () => void }
     catalogo: `${catalogItems.length} productos`,
     brand: "Logo, colores y tipografía de tu vitrina",
     qr: "Comparte tu menú con un código QR",
+    mesas: "Da de alta tus mesas y genera un QR para cada una",
     cocina: "Pedidos entrantes en tiempo real",
     pedidos: "Empaque y entrega de productos",
+    ventas: "Ventas realizadas, tickets e impresión",
     metrics: "Cómo se comporta tu menú esta semana",
   }[section];
 
@@ -196,8 +207,10 @@ export default function Panel({ me, onLogout }: { me: Me; onLogout: () => void }
             {section === "catalogo" && <MenuEditor coleccion={catalogCol} cats={catalogCats} items={items} reload={reload} idiomas={brand.idiomas} kind="catalogo" />}
             {section === "brand" && <Branding brand={brand} setBrand={setBrand} />}
             {section === "qr" && <QRView slug={slug} />}
-            {section === "cocina" && <Cocina kind="cocina" />}
-            {section === "pedidos" && <Cocina kind="pedidos" />}
+            {section === "mesas" && <Mesas slug={slug} num={brand.num_mesas} onSaved={(n) => setBrand({ ...brand, num_mesas: n })} />}
+            {section === "cocina" && <Cocina kind="cocina" negocio={brand.nombre} />}
+            {section === "pedidos" && <Cocina kind="pedidos" negocio={brand.nombre} />}
+            {section === "ventas" && <Ventas negocio={brand.nombre} />}
             {section === "metrics" && <Metrics items={menuItems} />}
           </div>
 

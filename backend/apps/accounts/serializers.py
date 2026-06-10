@@ -36,7 +36,7 @@ class TenantOutput(serializers.ModelSerializer):
         model = Tenant
         fields = (
             "id", "nombre", "slug", "dominio_propio", "tipo_negocio",
-            "modo_vitrina", "idioma_default", "idiomas", "activo",
+            "modo_vitrina", "idioma_default", "idiomas", "num_mesas", "activo",
         )
 
 
@@ -48,6 +48,7 @@ class TenantUpdateInput(serializers.Serializer):
     modo_vitrina = serializers.ChoiceField(choices=Tenant.ModoVitrina.choices, required=False)
     idioma_default = serializers.CharField(max_length=5, required=False)
     idiomas = serializers.ListField(child=serializers.CharField(max_length=5), required=False)
+    num_mesas = serializers.IntegerField(min_value=0, max_value=200, required=False)
 
 
 class TemaInput(serializers.Serializer):
