@@ -25,10 +25,12 @@ caduca (respuesta 401).
 
 | Método | Ruta | Descripción |
 |--------|------|-------------|
-| GET | `/auth/branding/` | Datos del negocio + tema (colores, tipografía, logo) |
-| PATCH | `/auth/branding/` | Actualiza negocio (`nombre`, `modo_vitrina`, `idiomas`, `idioma_default`) y/o tema |
+| GET | `/auth/branding/` | Datos del negocio + tema (colores, logo) |
+| PATCH | `/auth/branding/` | Actualiza negocio (`nombre`, `modo_vitrina`, `idiomas`, `idioma_default`, `num_mesas`) y/o tema |
 | POST | `/auth/branding/logo/` | Sube/reemplaza el logo (multipart, campo `logo`) |
 | DELETE | `/auth/branding/logo/` | Quita el logo |
+
+`TenantOutput` incluye ahora el campo `num_mesas` (entero, >= 0). `TenantUpdateInput` acepta `num_mesas` en el PATCH.
 
 ## Panel del dueño — Catálogo (menú y tienda)
 
@@ -74,8 +76,25 @@ Cada pedido incluye un campo calculado **`origen`**: `menu`, `catalogo` o `mixto
 | POST | `/public/<slug>/pedidos/` | El cliente crea un pedido |
 | GET | `/public/<slug>/pedidos/<numero>/` | Seguimiento del pedido por número |
 
-`disponible` es `false` si el negocio está suspendido. Las colecciones se filtran según
-`modo_vitrina` y si el módulo **Catálogo** está activo (ver [super-admin.md](super-admin.md)).
+`disponible` es `false` si el negocio está suspendido. Las colecciones se filtran según `modo_vitrina` y si el módulo **Catálogo** está activo (ver [super-admin.md](super-admin.md)).
+
+### Campos de `POST /public/<slug>/pedidos/`
+
+`PedidoCreateInput` acepta ahora el campo `telefono` (string, opcional). Ejemplo:
+
+```json
+{
+  "nombre_cliente": "Ana",
+  "mesa": "3",
+  "tipo": "local",
+  "items": [{"item_id": 12, "cantidad": 2}],
+  "telefono": "5512345678"
+}
+```
+
+### Campos de `PedidoOutput`
+
+La respuesta de creación y de seguimiento incluye el campo `telefono` (puede ser `null` si el cliente no lo proporcionó).
 
 ## Plataforma — Super-admin (`/api/admin/`)
 

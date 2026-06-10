@@ -35,9 +35,12 @@ Para una demo con datos cargados, ver [desarrollo.md](desarrollo.md) (comandos `
 
 ## Estado del proyecto (resumen)
 
-- ✅ **Cimientos:** Docker, Postgres, JWT, multi-tenant.
-- ✅ **Panel del dueño:** editor de menú (con arrastrar para reordenar, fotos, variantes), marca (logo/colores/tipografía), QR descargable, cocina, métricas.
-- ✅ **Vitrina pública:** menú por QR, multi-idioma ES/EN, modo tienda (catálogo).
-- ✅ **Plataforma (super-admin):** alta/suspensión de negocios, planes, módulos/add-ons.
-- ✅ **Módulo Catálogo:** el dueño crea productos → el cliente compra en la tienda → el dueño gestiona los pedidos (empaque/entrega).
-- 🔜 **Pendiente:** pago en línea real (fuera del MVP), métricas con eventos reales, despliegue a producción.
+- **Cimientos:** Docker, Postgres, JWT, multi-tenant.
+- **Panel del dueño:** editor de menú (con arrastrar para reordenar, fotos, variantes), marca (logo/colores de acento), QR del negocio, cocina, métricas.
+- **Vitrina pública:** categorías en tarjetas, navegación por categoría, cuadrícula de productos, orden persistente en localStorage, multi-idioma ES/EN, QR por mesa.
+- **Tickets:** impresión/PDF vía `window.print()` del navegador; envío por WhatsApp vía enlace `wa.me` (sin API externa). El dueño ve el recibo desde Ventas o Cocina; el cliente lo consulta en la pantalla de seguimiento.
+- **Sección Ventas:** resumen de ventas totales, número de pedidos, ticket promedio y lista de pedidos.
+- **Sección Mesas:** el dueño registra cuántas mesas tiene y descarga un QR por mesa.
+- **Módulo Catálogo:** el dueño crea productos, el cliente compra desde la vitrina, el dueño gestiona los pedidos (empaque/entrega).
+- **Plataforma (super-admin):** alta/suspensión de negocios, planes, módulos/add-ons.
+- **Pendiente:** pago en línea real (fuera del MVP), métricas con eventos reales, migrar tokens JWT del dueño a cookies httpOnly (antes de producción), despliegue a producción.
