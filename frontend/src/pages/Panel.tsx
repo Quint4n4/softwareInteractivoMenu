@@ -32,7 +32,7 @@ export interface Brand {
   num_mesas: number;
 }
 
-type Section = "menu" | "catalogo" | "brand" | "qr" | "mesas" | "cocina" | "pedidos" | "ventas" | "metrics";
+type Section = "menu" | "catalogo" | "brand" | "qr" | "cocina" | "pedidos" | "ventas" | "metrics";
 
 export default function Panel({ me, onLogout }: { me: Me; onLogout: () => void }) {
   const [section, setSection] = useState<Section>("menu");
@@ -106,8 +106,7 @@ export default function Panel({ me, onLogout }: { me: Me; onLogout: () => void }
       { id: "menu", label: "Menú", icon: "menu" },
       { id: "catalogo", label: "Catálogo", icon: "box" },
       { id: "brand", label: "Marca", icon: "palette" },
-      { id: "qr", label: "QR", icon: "qr" },
-      { id: "mesas", label: "Mesas", icon: "grip" },
+      { id: "qr", label: "QR y Mesas", icon: "qr" },
       { id: "cocina", label: "Cocina", icon: "bell" },
       { id: "pedidos", label: "Pedidos", icon: "receipt" },
       { id: "ventas", label: "Ventas", icon: "cash" },
@@ -119,8 +118,7 @@ export default function Panel({ me, onLogout }: { me: Me; onLogout: () => void }
     menu: "Editor de menú",
     catalogo: "Editor de catálogo",
     brand: "Marca y apariencia",
-    qr: "Código QR",
-    mesas: "Mesas y QR por mesa",
+    qr: "Códigos QR",
     cocina: "Cocina",
     pedidos: "Pedidos del catálogo",
     ventas: "Ventas",
@@ -130,8 +128,7 @@ export default function Panel({ me, onLogout }: { me: Me; onLogout: () => void }
     menu: `${menuItems.length} platillos · ${menuItems.filter((i) => !i.disponible).length} agotados`,
     catalogo: `${catalogItems.length} productos`,
     brand: "Logo, colores y tipografía de tu vitrina",
-    qr: "Comparte tu menú con un código QR",
-    mesas: "Da de alta tus mesas y genera un QR para cada una",
+    qr: "QR general (para llevar/compartir) y un QR por cada mesa",
     cocina: "Pedidos entrantes en tiempo real",
     pedidos: "Empaque y entrega de productos",
     ventas: "Ventas realizadas, tickets e impresión",
@@ -206,8 +203,12 @@ export default function Panel({ me, onLogout }: { me: Me; onLogout: () => void }
             {section === "menu" && <MenuEditor coleccion={menuCol} cats={menuCats} items={items} reload={reload} idiomas={brand.idiomas} kind="menu" />}
             {section === "catalogo" && <MenuEditor coleccion={catalogCol} cats={catalogCats} items={items} reload={reload} idiomas={brand.idiomas} kind="catalogo" />}
             {section === "brand" && <Branding brand={brand} setBrand={setBrand} />}
-            {section === "qr" && <QRView slug={slug} />}
-            {section === "mesas" && <Mesas slug={slug} num={brand.num_mesas} onSaved={(n) => setBrand({ ...brand, num_mesas: n })} />}
+            {section === "qr" && (
+              <div className="col" style={{ gap: 16 }}>
+                <QRView slug={slug} />
+                <Mesas slug={slug} num={brand.num_mesas} onSaved={(n) => setBrand({ ...brand, num_mesas: n })} />
+              </div>
+            )}
             {section === "cocina" && <Cocina kind="cocina" negocio={brand.nombre} />}
             {section === "pedidos" && <Cocina kind="pedidos" negocio={brand.nombre} />}
             {section === "ventas" && <Ventas negocio={brand.nombre} />}

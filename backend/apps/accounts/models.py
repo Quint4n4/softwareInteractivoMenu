@@ -35,6 +35,7 @@ class Tenant(TimeStamped):
     idioma_default = models.CharField(max_length=5, default="es")
     idiomas = models.JSONField(default=list, blank=True, help_text='["es", "en"]')
     num_mesas = models.PositiveIntegerField(default=0, help_text="Número de mesas del restaurante (para generar un QR por mesa)")
+    proximo_cobro = models.DateField(null=True, blank=True, help_text="Fecha del próximo cobro de la suscripción")
     activo = models.BooleanField(default=True)
     plan = models.ForeignKey(
         "Plan", on_delete=models.SET_NULL, null=True, blank=True, related_name="tenants"

@@ -85,3 +85,41 @@ def tenant_active_modulos(*, tenant: Tenant) -> list[str]:
             "modulo__clave", flat=True
         )
     )
+
+
+def platform_stats() -> dict[str, Any]:
+    """Métricas globales para el tablero del super-admin (cruza TODOS los negocios)."""
+    from datetime import date
+    from decimal import Decimal
+
+    from django.db.models import Sum
+
+    from apps.orders.models import Pedido
+
+    tenants = Tenant.objects.all()
+    total = tenants.count()
+    activos = tenants.filter(activo=True).count()
+    activos_ids = list(tenants.filter(activo=True).values_list("id", flat=True))
+    vencidos = tenants.filter(proximo_cobro__lt=date.today()).count()
+
+    # MRR = planes de negocios activos + add-ons activos (los suspendidos no pagan).
+    mrr = Decimal("0")
+    for t in Tenant.objects.filter(id__in=activos_ids).select_related("plan"):
+        if t.plan:
+            mrr += t.plan.precio_base
+    for tm in TenantModulo.objects.filter(tenant_id__in=activos_ids, activo=True).select_related("modulo"):
+        mrr += tm.precio_aplicado if tm.precio_aplicado and tm.precio_aplicado > 0 else tm.modulo.precio_addon
+
+    # Ventas de toda la plataforma (sin cancelados), cruzando tenants.
+    pedidos = Pedido.all_objects.exclude(estado="cancelado")
+    ventas_total = pedidos.aggregate(s=Sum("total"))["s"] or Decimal("0")
+
+    return {
+        "negocios_total": total,
+        "negocios_activos": activos,
+        "negocios_suspendidos": total - activos,
+        "negocios_vencidos": vencidos,
+        "mrr": str(mrr),
+        "ventas_total": str(ventas_total),
+        "pedidos_total": pedidos.count(),
+    }

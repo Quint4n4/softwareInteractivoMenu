@@ -78,13 +78,21 @@ class AdminTenantOutput(serializers.ModelSerializer):
     """Vista de un negocio para el panel de plataforma (incluye plan y dueño)."""
     plan_nombre = serializers.CharField(source="plan.nombre", read_only=True, default=None)
     owner_email = serializers.SerializerMethodField()
+    estado_pago = serializers.SerializerMethodField()
 
     class Meta:
         model = Tenant
         fields = (
             "id", "nombre", "slug", "tipo_negocio", "modo_vitrina", "idiomas",
-            "activo", "plan", "plan_nombre", "owner_email", "creado",
+            "activo", "plan", "plan_nombre", "owner_email", "proximo_cobro", "estado_pago", "creado",
         )
+
+    def get_estado_pago(self, obj: Tenant) -> str:
+        from datetime import date
+
+        if not obj.proximo_cobro:
+            return "prueba"
+        return "al_corriente" if obj.proximo_cobro >= date.today() else "vencido"
 
     def get_owner_email(self, obj: Tenant) -> str | None:
         # Itera sobre miembros prefetcheados (sin N+1).
@@ -100,6 +108,7 @@ class AdminTenantUpdateInput(serializers.Serializer):
     tipo_negocio = serializers.ChoiceField(choices=Tenant.TipoNegocio.choices, required=False)
     modo_vitrina = serializers.ChoiceField(choices=Tenant.ModoVitrina.choices, required=False)
     plan_id = serializers.IntegerField(required=False, allow_null=True)
+    proximo_cobro = serializers.DateField(required=False, allow_null=True)
 
 
 # ----------------------- Módulos / add-ons -----------------------

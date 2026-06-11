@@ -1,11 +1,13 @@
 """Casos de uso de cuentas (escrituras)."""
 from __future__ import annotations
 
+from datetime import date
 from decimal import Decimal
 from typing import Any
 
 from django.contrib.auth import get_user_model
 from django.db import transaction
+from django.utils.crypto import get_random_string
 from django.utils.text import slugify
 
 from rest_framework.exceptions import ValidationError
@@ -13,6 +15,9 @@ from rest_framework.exceptions import ValidationError
 from .models import Membership, Modulo, Plan, Tema, Tenant, TenantModulo
 
 User = get_user_model()
+
+# Caracteres legibles para contraseñas temporales (sin 0/O/1/l/I que confunden).
+_PW_ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789abcdefghijkmnpqrstuvwxyz"
 
 # Campos del negocio que no se cambian por un update genérico.
 _TENANT_IMMUTABLE: frozenset[str] = frozenset(
@@ -74,6 +79,41 @@ def tenant_reactivate(*, tenant: Tenant) -> Tenant:
     tenant.activo = True
     tenant.save(update_fields=["activo"])
     return tenant
+
+
+def _add_one_month(d: date) -> date:
+    import calendar
+
+    m, y = d.month + 1, d.year
+    if m > 12:
+        m, y = 1, y + 1
+    return d.replace(year=y, month=m, day=min(d.day, calendar.monthrange(y, m)[1]))
+
+
+def tenant_register_payment(*, tenant: Tenant) -> Tenant:
+    """Registra un pago: adelanta el próximo cobro un mes y reactiva el negocio."""
+    hoy = date.today()
+    base = tenant.proximo_cobro if tenant.proximo_cobro and tenant.proximo_cobro > hoy else hoy
+    tenant.proximo_cobro = _add_one_month(base)
+    tenant.activo = True
+    tenant.save(update_fields=["proximo_cobro", "activo"])
+    return tenant
+
+
+def tenant_reset_owner_password(*, tenant: Tenant) -> str:
+    """Genera una contraseña temporal para el dueño del negocio (soporte) y la devuelve."""
+    membership = (
+        Membership.objects.filter(tenant=tenant, rol="owner")
+        .select_related("usuario")
+        .first()
+    )
+    if membership is None:
+        raise ValidationError("Este negocio no tiene dueño.")
+    password = get_random_string(10, _PW_ALPHABET)
+    user = membership.usuario
+    user.set_password(password)
+    user.save(update_fields=["password"])
+    return password
 
 
 def tenant_admin_update(*, tenant: Tenant, **fields: Any) -> Tenant:

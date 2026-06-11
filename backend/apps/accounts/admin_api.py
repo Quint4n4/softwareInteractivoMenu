@@ -19,6 +19,7 @@ from .permissions import IsPlatformAdmin
 from .selectors import (
     modulo_list,
     plan_list,
+    platform_stats,
     tenant_get_any,
     tenant_list_all,
     tenant_modulos_overview,
@@ -36,6 +37,8 @@ from .services import (
     owner_register,
     tenant_admin_update,
     tenant_reactivate,
+    tenant_register_payment,
+    tenant_reset_owner_password,
     tenant_set_modulo,
     tenant_suspend,
 )
@@ -91,11 +94,37 @@ class AdminTenantReactivateApi(APIView):
         return Response(AdminTenantOutput(tenant).data)
 
 
+class AdminTenantPagoApi(APIView):
+    """Registra un pago de la suscripción: adelanta el próximo cobro y reactiva."""
+    permission_classes = PLATFORM_PERMS
+
+    def post(self, request: Request, pk: UUID) -> Response:
+        tenant = tenant_register_payment(tenant=tenant_get_any(tenant_id=pk))
+        return Response(AdminTenantOutput(tenant).data)
+
+
+class AdminTenantResetPasswordApi(APIView):
+    """Genera una nueva contraseña para el dueño del negocio (soporte)."""
+    permission_classes = PLATFORM_PERMS
+
+    def post(self, request: Request, pk: UUID) -> Response:
+        password = tenant_reset_owner_password(tenant=tenant_get_any(tenant_id=pk))
+        return Response({"password": password})
+
+
 class AdminPlanListApi(APIView):
     permission_classes = PLATFORM_PERMS
 
     def get(self, request: Request) -> Response:
         return Response(PlanOutput(plan_list(), many=True).data)
+
+
+class AdminStatsApi(APIView):
+    """Métricas globales de la plataforma (tablero del super-admin)."""
+    permission_classes = PLATFORM_PERMS
+
+    def get(self, request: Request) -> Response:
+        return Response(platform_stats())
 
 
 class AdminModuloListApi(APIView):

@@ -4,13 +4,18 @@ import {
   type AdminNegocio,
   type AdminPlan,
   type ModuloOverview,
+  type PlatformStats,
   asignarPlan,
   crearNegocio,
+  getPlatformStats,
   listModulosDe,
   listNegocios,
   listPlanes,
   reactivarNegocio,
+  registrarPago,
+  resetPassword,
   setModulo,
+  setProximoCobro,
   suspenderNegocio,
 } from "../api/admin";
 import { type Me } from "../api/auth";
@@ -40,6 +45,7 @@ function NegocioCard({
   const [openMods, setOpenMods] = useState(false);
   const [mods, setMods] = useState<ModuloOverview[] | null>(null);
   const [modBusy, setModBusy] = useState<string | null>(null);
+  const [resetPw, setResetPw] = useState<string | null>(null);
 
   async function toggleEstado() {
     setBusy(true);
@@ -57,6 +63,35 @@ function NegocioCard({
     setBusy(true);
     try {
       onChange(await asignarPlan(negocio.id, planId));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function cobrar() {
+    setBusy(true);
+    try {
+      onChange(await registrarPago(negocio.id));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function cambiarFecha(fecha: string | null) {
+    setBusy(true);
+    try {
+      onChange(await setProximoCobro(negocio.id, fecha));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function resetear() {
+    if (!window.confirm(`¿Resetear la contraseña del dueño de ${negocio.nombre}? Se generará una nueva.`)) return;
+    setBusy(true);
+    try {
+      const { password } = await resetPassword(negocio.id);
+      setResetPw(password);
     } finally {
       setBusy(false);
     }
@@ -83,6 +118,9 @@ function NegocioCard({
     }
   }
 
+  const pagoCls = negocio.estado_pago === "al_corriente" ? "st-ready" : negocio.estado_pago === "vencido" ? "st-new" : "chip--line";
+  const pagoLabel = negocio.estado_pago === "al_corriente" ? "Al corriente" : negocio.estado_pago === "vencido" ? "Vencido" : "Prueba";
+
   return (
     <section className="card panelcard">
       <div className="pneg__row">
@@ -97,6 +135,9 @@ function NegocioCard({
             {negocio.slug}.vitrina.app · {negocio.owner_email ?? "sin dueño"}
           </div>
         </div>
+        <button className="btn btn--ghost btn--sm" disabled={busy} onClick={resetear} title="Resetear contraseña del dueño">
+          <Icon name="user" size={15} /> Contraseña
+        </button>
         <a className="btn btn--ghost btn--sm" href={`/v/${negocio.slug}`} target="_blank" rel="noreferrer">
           <Icon name="eye" size={15} /> Vitrina
         </a>
@@ -130,6 +171,23 @@ function NegocioCard({
         </button>
       </div>
 
+      <div className="pneg__row" style={{ marginTop: 10, gap: 8, alignItems: "center" }}>
+        <span className={"chip " + pagoCls}>{pagoLabel}</span>
+        <span className="mute2" style={{ fontSize: 12 }}>Próx. cobro</span>
+        <input
+          type="date"
+          className="field"
+          style={{ width: 150, padding: "6px 10px" }}
+          value={negocio.proximo_cobro ?? ""}
+          disabled={busy}
+          onChange={(ev) => cambiarFecha(ev.target.value || null)}
+        />
+        <div className="grow" />
+        <button className="btn btn--soft btn--sm" disabled={busy} onClick={cobrar}>
+          <Icon name="cash" size={14} /> Registrar pago
+        </button>
+      </div>
+
       {openMods && (
         <div style={{ marginTop: 6 }}>
           {mods === null && <div className="muted" style={{ fontSize: 13, padding: "8px 0" }}>Cargando módulos…</div>}
@@ -153,6 +211,24 @@ function NegocioCard({
               ><i /></button>
             </div>
           ))}
+        </div>
+      )}
+
+      {resetPw && (
+        <div className="overlay" onClick={() => setResetPw(null)}>
+          <div className="sheet" style={{ maxWidth: 380 }} onClick={(e) => e.stopPropagation()}>
+            <div className="sheet__head spread">
+              <span className="display" style={{ fontSize: 17 }}>Nueva contraseña</span>
+              <button type="button" className="iconbtn iconbtn--xs" onClick={() => setResetPw(null)} aria-label="Cerrar"><Icon name="x" size={16} /></button>
+            </div>
+            <div className="sheet__body col" style={{ gap: 10 }}>
+              <p className="mute2" style={{ fontSize: 13 }}>Compártela con el dueño de <b>{negocio.nombre}</b>. Podrá cambiarla al entrar.</p>
+              <div className="field" style={{ fontWeight: 800, fontSize: 16, textAlign: "center", letterSpacing: "0.05em" }}>{resetPw}</div>
+              <button className="btn btn--primary btn--block" onClick={() => void navigator.clipboard.writeText(resetPw)}>
+                <Icon name="check" size={15} /> Copiar
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </section>
@@ -234,14 +310,16 @@ export default function Admin({ me, onLogout }: { me: Me; onLogout: () => void }
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showNew, setShowNew] = useState(false);
+  const [stats, setStats] = useState<PlatformStats | null>(null);
 
   async function load() {
     setLoading(true);
     setError(null);
     try {
-      const [ns, ps] = await Promise.all([listNegocios(), listPlanes()]);
+      const [ns, ps, st] = await Promise.all([listNegocios(), listPlanes(), getPlatformStats().catch(() => null)]);
       setNegocios(ns);
       setPlanes(ps);
+      setStats(st);
     } catch (err) {
       setError(apiError(err, "No se pudieron cargar los negocios."));
     } finally {
@@ -255,6 +333,7 @@ export default function Admin({ me, onLogout }: { me: Me; onLogout: () => void }
   }
 
   const activos = negocios.filter((n) => n.activo).length;
+  const money = (s: string) => "$" + Number(s).toLocaleString("es-MX", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
   return (
     <div className="padmin">
@@ -269,6 +348,28 @@ export default function Admin({ me, onLogout }: { me: Me; onLogout: () => void }
       </header>
 
       <div className="padmin__wrap">
+        {stats && (
+          <div className="statgrid" style={{ marginBottom: 18 }}>
+            <div className="card statcard">
+              <div className="statcard__ico"><Icon name="box" size={18} /></div>
+              <div className="statcard__val tnum">{stats.negocios_total}</div>
+              <div className="statcard__lbl">Negocios</div>
+              <div className="mute2" style={{ fontSize: 11.5, marginTop: 2 }}>{stats.negocios_activos} activos · {stats.negocios_vencidos} vencidos</div>
+            </div>
+            <div className="card statcard">
+              <div className="statcard__ico"><Icon name="cash" size={18} /></div>
+              <div className="statcard__val tnum">{money(stats.mrr)}</div>
+              <div className="statcard__lbl">Ingreso mensual (MRR)</div>
+              <div className="mute2" style={{ fontSize: 11.5, marginTop: 2 }}>planes + add-ons activos</div>
+            </div>
+            <div className="card statcard">
+              <div className="statcard__ico"><Icon name="receipt" size={18} /></div>
+              <div className="statcard__val tnum">{money(stats.ventas_total)}</div>
+              <div className="statcard__lbl">Ventas de la plataforma</div>
+              <div className="mute2" style={{ fontSize: 11.5, marginTop: 2 }}>{stats.pedidos_total} pedidos</div>
+            </div>
+          </div>
+        )}
         <div className="spread">
           <div>
             <div className="display" style={{ fontSize: 22 }}>Negocios</div>

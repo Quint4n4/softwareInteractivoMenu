@@ -36,9 +36,10 @@ export default function QRView({ slug }: { slug: string }) {
   return (
     <div className="col" style={{ gap: 16, maxWidth: 520 }}>
       <section className="card panelcard">
-        <h3 className="panelcard__h"><Icon name="qr" size={17} /> Código QR de tu vitrina</h3>
+        <h3 className="panelcard__h"><Icon name="qr" size={17} /> QR general (para llevar y compartir)</h3>
         <p className="muted" style={{ fontSize: 13.5, marginTop: 0 }}>
-          Imprímelo y ponlo en tus mesas. Al escanearlo, tus clientes ven tu menú.
+          Úsalo para <b>para llevar</b>, compartir tu menú en redes o ponerlo en la puerta/mostrador.
+          Para el servicio en mesa, usa los <b>QR por mesa</b> de abajo.
         </p>
         <div className="row" style={{ gap: 20, alignItems: "center", flexWrap: "wrap" }}>
           <div style={{ background: "#fff", padding: 10, borderRadius: 14, border: "1px solid var(--line)" }}>
