@@ -1,5 +1,7 @@
 import { type FormEvent, useState } from "react";
 
+import { useConfirm } from "../ui/confirm";
+
 import {
   type Categoria,
   type Coleccion,
@@ -494,8 +496,10 @@ export default function MenuEditor({
     await reload();
   }
 
+  const confirm = useConfirm();
+
   async function removeCategoria(id: number) {
-    if (!confirm(L.borrarCat)) return;
+    if (!(await confirm({ title: "Borrar categoría", message: L.borrarCat, confirmLabel: "Borrar", danger: true }))) return;
     await deleteCategoria(id);
     await reload();
   }
@@ -534,7 +538,7 @@ export default function MenuEditor({
   }
 
   async function removeItem(id: number) {
-    if (!confirm(L.borrarItem)) return;
+    if (!(await confirm({ title: "Borrar platillo", message: L.borrarItem, confirmLabel: "Borrar", danger: true }))) return;
     await deleteItem(id);
     await reload();
   }

@@ -3,6 +3,7 @@ import { useCallback, useEffect, useState } from "react";
 import { listPedidos, type Pedido, setPedidoEstado } from "../api/orders";
 import Icon from "../ui/Icon";
 import { printTicket, waTicketUrl } from "../ui/ticket";
+import { useConfirm } from "../ui/confirm";
 
 type Col = { estado: string; label: string; cls: string; next: string | null; action: string | null };
 
@@ -25,6 +26,7 @@ const PEDIDOS_COLS: Col[] = [
 export default function Cocina({ kind = "cocina", negocio }: { kind?: "cocina" | "pedidos"; negocio: string }) {
   const [pedidos, setPedidos] = useState<Pedido[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const confirm = useConfirm();
 
   const load = useCallback(() => {
     listPedidos()
@@ -49,7 +51,12 @@ export default function Cocina({ kind = "cocina", negocio }: { kind?: "cocina" |
       (p) => p.tipo === "mesa" && p.mesa_texto === mesa && p.estado !== "entregado" && p.estado !== "cancelado",
     );
     if (!activos.length) return;
-    if (!window.confirm(`¿Liberar Mesa ${mesa}? Se cerrarán ${activos.length} pedido(s) y la mesa quedará libre.`)) return;
+    const ok = await confirm({
+      title: "Liberar mesa",
+      message: `¿Liberar Mesa ${mesa}? Se cerrarán ${activos.length} pedido(s) y la mesa quedará libre.`,
+      confirmLabel: "Liberar",
+    });
+    if (!ok) return;
     await Promise.all(activos.map((p) => setPedidoEstado(p.id, "entregado")));
     load();
   }
