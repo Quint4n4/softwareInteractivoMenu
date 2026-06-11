@@ -16,6 +16,7 @@ export interface AdminNegocio {
   owner_email: string | null;
   proximo_cobro: string | null;
   estado_pago: string;
+  modulos_activos: { clave: string; nombre: string }[];
   creado: string;
 }
 
@@ -24,6 +25,8 @@ export interface AdminPlan {
   nombre: string;
   precio_base: string;
   descripcion: string;
+  ciclo: string;
+  modulos: string[];
 }
 
 export interface ModuloOverview {
@@ -35,6 +38,13 @@ export interface ModuloOverview {
   precio_aplicado: string | null;
 }
 
+export interface ModuloCatalog {
+  clave: string;
+  nombre: string;
+  descripcion: string;
+  precio_addon: string;
+}
+
 export interface PlatformStats {
   negocios_total: number;
   negocios_activos: number;
@@ -43,6 +53,8 @@ export interface PlatformStats {
   mrr: string;
   ventas_total: string;
   pedidos_total: number;
+  ventas_por_mes: { mes: string; total: string }[];
+  por_cobrar_mes: string;
 }
 
 export interface NuevoNegocio {
@@ -97,6 +109,17 @@ export async function listPlanes(): Promise<AdminPlan[]> {
   const { data } = await api.get<AdminPlan[]>("/admin/planes/");
   return data;
 }
+export async function crearPlan(payload: { nombre: string; precio_base: string; descripcion?: string; ciclo?: string; modulos?: string[] }): Promise<AdminPlan> {
+  const { data } = await api.post<AdminPlan>("/admin/planes/", payload);
+  return data;
+}
+export async function actualizarPlan(id: number, payload: { nombre?: string; precio_base?: string; descripcion?: string; ciclo?: string; modulos?: string[] }): Promise<AdminPlan> {
+  const { data } = await api.patch<AdminPlan>(`/admin/planes/${id}/`, payload);
+  return data;
+}
+export async function eliminarPlan(id: number): Promise<void> {
+  await api.delete(`/admin/planes/${id}/`);
+}
 
 // ---- Estadísticas de la plataforma ----
 export async function getPlatformStats(): Promise<PlatformStats> {
@@ -118,5 +141,9 @@ export async function setModulo(
     clave,
     activo,
   });
+  return data;
+}
+export async function listModulosCatalog(): Promise<ModuloCatalog[]> {
+  const { data } = await api.get<ModuloCatalog[]>("/admin/modulos/");
   return data;
 }

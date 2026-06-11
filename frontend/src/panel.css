@@ -133,6 +133,58 @@ button { font-family: inherit; }
 .ov-line { display: flex; justify-content: space-between; gap: 10px; font-size: 13.5px; padding: 4px 0; }
 .ov-rule { border-top: 1px dashed var(--line); margin: 12px 0; }
 .ov-total { display: flex; justify-content: space-between; font-weight: 800; font-size: 16px; padding-top: 6px; }
+
+/* ============ Tema GLASS — panel de plataforma (super-admin) ============ */
+.padmin {
+  --accent: #f97316;
+  --accent-2: #fb923c;
+  --accent-soft: rgba(249, 115, 22, 0.14);
+  --accent-tint: rgba(249, 115, 22, 0.08);
+  --ink: #2a2520;
+  --ink-soft: #6b6259;
+  --ink-mute: #9a9089;
+  --line: rgba(120, 80, 30, 0.12);
+  --line-soft: rgba(120, 80, 30, 0.07);
+  background:
+    linear-gradient(160deg, rgba(255, 247, 238, 0.45), rgba(255, 238, 224, 0.34)),
+    url("/dashboard-bg.jpg") center center / cover no-repeat;
+  background-attachment: fixed;
+}
+.padmin__top {
+  background: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(16px) saturate(140%);
+  -webkit-backdrop-filter: blur(16px) saturate(140%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.55);
+}
+.padmin__mark { background: linear-gradient(135deg, var(--accent), var(--accent-2)) !important; color: #fff; }
+.padmin .card,
+.padmin .statcard {
+  background: rgba(255, 255, 255, 0.55);
+  backdrop-filter: blur(18px) saturate(150%);
+  -webkit-backdrop-filter: blur(18px) saturate(150%);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  box-shadow: 0 12px 36px -16px rgba(120, 60, 10, 0.25);
+}
+.padmin .statcard__ico { background: linear-gradient(135deg, var(--accent), var(--accent-2)); color: #fff; }
+.padmin .btn--primary { background: linear-gradient(135deg, var(--accent), var(--accent-2)); }
+.padmin .field { background: rgba(255, 255, 255, 0.7); }
+
+.padmin-grid2 { display: grid; grid-template-columns: 1.4fr 1fr; gap: 16px; margin-bottom: 18px; }
+@media (max-width: 880px) { .padmin-grid2 { grid-template-columns: 1fr; } }
+.padmin-card-h { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+.padmin-card-h .t { font-weight: 800; font-size: 15px; }
+
+.cal-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+.cal-dow { text-align: center; font-size: 10px; font-weight: 800; color: var(--ink-mute); padding: 2px 0; }
+.cal-day { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-size: 12.5px; font-weight: 700; color: var(--ink-soft); border-radius: 9px; position: relative; }
+.cal-day.is-empty { visibility: hidden; }
+.cal-day.is-today { outline: 1.5px solid var(--accent); outline-offset: -1.5px; }
+.cal-day.has-cobro { background: var(--accent-soft); color: var(--accent); font-weight: 800; }
+.cal-day.is-overdue { background: var(--st-new-bg); color: var(--st-new); font-weight: 800; }
+.cal-dot { position: absolute; bottom: 3px; width: 4px; height: 4px; border-radius: 999px; background: currentColor; }
+.cob-list { margin-top: 14px; display: flex; flex-direction: column; gap: 7px; }
+.cob-item { display: flex; align-items: center; gap: 8px; font-size: 12.5px; }
 .btn:disabled { opacity: 0.45; cursor: default; box-shadow: none; }
 
 .iconbtn {
@@ -245,7 +297,7 @@ textarea.field { resize: vertical; min-height: 72px; font-weight: 500; line-heig
 }
 
 /* ============ Panel super-admin de plataforma ============ */
-.padmin { min-height: 100vh; background: var(--canvas); }
+.padmin { min-height: 100vh; }
 .padmin__top {
   position: sticky; top: 0; z-index: 10;
   display: flex; align-items: center; gap: 12px;
@@ -266,4 +318,30 @@ textarea.field { resize: vertical; min-height: 72px; font-weight: 500; line-heig
 .pmodrow {
   display: flex; align-items: center; gap: 12px;
   padding: 10px 2px; border-top: 1px solid var(--line-soft);
+}
+
+/* Tarjeta de negocio — secciones (Plan · Cobro · Plugins) */
+.padmin .neg-head { display: flex; align-items: flex-start; gap: 10px; flex-wrap: wrap; }
+.padmin .neg-badges { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.padmin .neg-body {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  margin: 14px 0 4px;
+}
+.padmin .neg-col { padding: 2px 18px; min-width: 0; }
+.padmin .neg-col + .neg-col { border-left: 1px solid var(--line); }
+.padmin .neg-col:first-child { padding-left: 0; }
+.padmin .neg-lbl {
+  font-size: 11px; letter-spacing: 0.05em; text-transform: uppercase;
+  color: var(--ink-mute); margin-bottom: 9px;
+}
+.padmin .neg-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.padmin .neg-chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 12px; font-weight: 700; padding: 4px 10px; border-radius: 999px;
+  background: var(--surface); border: 1px solid var(--line); color: var(--ink);
+}
+.padmin .neg-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); flex: none; }
+.padmin .neg-foot {
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  border-top: 1px solid var(--line); padding-top: 14px; margin-top: 14px;
 }
