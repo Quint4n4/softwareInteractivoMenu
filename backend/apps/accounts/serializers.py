@@ -69,9 +69,22 @@ class TemaOutput(serializers.ModelSerializer):
 
 # --------------------- Plataforma (super-admin) ---------------------
 class PlanOutput(serializers.ModelSerializer):
+    modulos = serializers.SerializerMethodField()
+
     class Meta:
         model = Plan
-        fields = ("id", "nombre", "precio_base", "descripcion")
+        fields = ("id", "nombre", "precio_base", "descripcion", "ciclo", "modulos")
+
+    def get_modulos(self, obj: Plan) -> list[str]:
+        return list(obj.modulos.values_list("clave", flat=True))
+
+
+class PlanInput(serializers.Serializer):
+    nombre = serializers.CharField(max_length=60)
+    precio_base = serializers.DecimalField(max_digits=10, decimal_places=2, min_value=0)
+    descripcion = serializers.CharField(required=False, allow_blank=True, default="")
+    ciclo = serializers.ChoiceField(choices=Plan.Ciclo.choices, required=False, default="anual")
+    modulos = serializers.ListField(child=serializers.CharField(), required=False, default=list)
 
 
 class AdminTenantOutput(serializers.ModelSerializer):
@@ -79,13 +92,23 @@ class AdminTenantOutput(serializers.ModelSerializer):
     plan_nombre = serializers.CharField(source="plan.nombre", read_only=True, default=None)
     owner_email = serializers.SerializerMethodField()
     estado_pago = serializers.SerializerMethodField()
+    modulos_activos = serializers.SerializerMethodField()
 
     class Meta:
         model = Tenant
         fields = (
             "id", "nombre", "slug", "tipo_negocio", "modo_vitrina", "idiomas",
-            "activo", "plan", "plan_nombre", "owner_email", "proximo_cobro", "estado_pago", "creado",
+            "activo", "plan", "plan_nombre", "owner_email", "proximo_cobro", "estado_pago",
+            "modulos_activos", "creado",
         )
+
+    def get_modulos_activos(self, obj: Tenant) -> list[dict[str, str]]:
+        # Plugins activos del negocio (usa el prefetch modulos__modulo, sin N+1).
+        return [
+            {"clave": tm.modulo.clave, "nombre": tm.modulo.nombre}
+            for tm in obj.modulos.all()
+            if tm.activo
+        ]
 
     def get_estado_pago(self, obj: Tenant) -> str:
         from datetime import date

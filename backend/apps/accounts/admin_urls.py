@@ -3,6 +3,7 @@ from django.urls import path
 
 from .admin_api import (
     AdminModuloListApi,
+    AdminPlanDetailApi,
     AdminPlanListApi,
     AdminStatsApi,
     AdminTenantDetailApi,
@@ -24,5 +25,6 @@ urlpatterns = [
     path("negocios/<uuid:pk>/modulos/", AdminTenantModuloApi.as_view(), name="admin-negocio-modulos"),
     path("modulos/", AdminModuloListApi.as_view(), name="admin-modulo-list"),
     path("planes/", AdminPlanListApi.as_view(), name="admin-plan-list"),
+    path("planes/<int:pk>/", AdminPlanDetailApi.as_view(), name="admin-plan-detail"),
     path("stats/", AdminStatsApi.as_view(), name="admin-stats"),
 ]

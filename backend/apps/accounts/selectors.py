@@ -26,7 +26,7 @@ def tenant_list_all() -> QuerySet[Tenant]:
     """TODOS los negocios. Solo para el panel de plataforma (super-admin)."""
     return (
         Tenant.objects.select_related("plan")
-        .prefetch_related("miembros__usuario")
+        .prefetch_related("miembros__usuario", "modulos__modulo")
         .order_by("-creado")
     )
 
@@ -36,7 +36,7 @@ def tenant_get_any(*, tenant_id: UUID) -> Tenant:
     try:
         return (
             Tenant.objects.select_related("plan")
-            .prefetch_related("miembros__usuario")
+            .prefetch_related("miembros__usuario", "modulos__modulo")
             .get(id=tenant_id)
         )
     except Tenant.DoesNotExist:
@@ -45,6 +45,13 @@ def tenant_get_any(*, tenant_id: UUID) -> Tenant:
 
 def plan_list() -> QuerySet[Plan]:
     return Plan.objects.order_by("precio_base")
+
+
+def plan_get(*, plan_id: int) -> Plan:
+    try:
+        return Plan.objects.get(id=plan_id)
+    except Plan.DoesNotExist:
+        raise NotFound("Plan no encontrado.")
 
 
 # ---------------- Módulos / add-ons (plataforma) ----------------
@@ -103,16 +110,43 @@ def platform_stats() -> dict[str, Any]:
     vencidos = tenants.filter(proximo_cobro__lt=date.today()).count()
 
     # MRR = planes de negocios activos + add-ons activos (los suspendidos no pagan).
+    # MRR (ingreso mensual equivalente): los planes anuales aportan precio/12; la prueba, 0.
     mrr = Decimal("0")
     for t in Tenant.objects.filter(id__in=activos_ids).select_related("plan"):
-        if t.plan:
-            mrr += t.plan.precio_base
-    for tm in TenantModulo.objects.filter(tenant_id__in=activos_ids, activo=True).select_related("modulo"):
-        mrr += tm.precio_aplicado if tm.precio_aplicado and tm.precio_aplicado > 0 else tm.modulo.precio_addon
+        if t.plan and t.plan.ciclo == "anual":
+            mrr += t.plan.precio_base / 12
+    mrr = mrr.quantize(Decimal("0.01"))
 
     # Ventas de toda la plataforma (sin cancelados), cruzando tenants.
     pedidos = Pedido.all_objects.exclude(estado="cancelado")
     ventas_total = pedidos.aggregate(s=Sum("total"))["s"] or Decimal("0")
+
+    # Ventas por mes (últimos 6 meses) para la gráfica del tablero.
+    import calendar as _cal
+
+    y, m = date.today().year, date.today().month
+    meses_ym: list[tuple[int, int]] = []
+    for _ in range(6):
+        meses_ym.append((y, m))
+        m -= 1
+        if m == 0:
+            m, y = 12, y - 1
+    meses_ym.reverse()
+    ventas_por_mes = [
+        {
+            "mes": f"{mm:02d}/{yy % 100:02d}",
+            "total": str(pedidos.filter(creado__year=yy, creado__month=mm).aggregate(s=Sum("total"))["s"] or Decimal("0")),
+        }
+        for (yy, mm) in meses_ym
+    ]
+
+    # Por cobrar este mes (estimado): planes de negocios vencidos o que vencen este mes.
+    hoy = date.today()
+    fin_mes = date(hoy.year, hoy.month, _cal.monthrange(hoy.year, hoy.month)[1])
+    por_cobrar = Decimal("0")
+    for t in Tenant.objects.filter(proximo_cobro__isnull=False, proximo_cobro__lte=fin_mes).select_related("plan"):
+        if t.plan:
+            por_cobrar += t.plan.precio_base
 
     return {
         "negocios_total": total,
@@ -122,4 +156,6 @@ def platform_stats() -> dict[str, Any]:
         "mrr": str(mrr),
         "ventas_total": str(ventas_total),
         "pedidos_total": pedidos.count(),
+        "ventas_por_mes": ventas_por_mes,
+        "por_cobrar_mes": str(por_cobrar),
     }

@@ -7,6 +7,7 @@ from typing import Any
 
 from django.contrib.auth import get_user_model
 from django.db import transaction
+from django.db.models import ProtectedError
 from django.utils.crypto import get_random_string
 from django.utils.text import slugify
 
@@ -81,20 +82,27 @@ def tenant_reactivate(*, tenant: Tenant) -> Tenant:
     return tenant
 
 
-def _add_one_month(d: date) -> date:
+def _add_months(d: date, n: int) -> date:
     import calendar
 
-    m, y = d.month + 1, d.year
-    if m > 12:
-        m, y = 1, y + 1
+    total = d.month - 1 + n
+    y = d.year + total // 12
+    m = total % 12 + 1
     return d.replace(year=y, month=m, day=min(d.day, calendar.monthrange(y, m)[1]))
 
 
+_CICLO_MESES = {"prueba": 3, "anual": 12}
+
+
+def _plan_meses(tenant: Tenant) -> int:
+    return _CICLO_MESES.get(tenant.plan.ciclo, 12) if tenant.plan else 1
+
+
 def tenant_register_payment(*, tenant: Tenant) -> Tenant:
-    """Registra un pago: adelanta el próximo cobro un mes y reactiva el negocio."""
+    """Registra un pago: adelanta el próximo cobro según el ciclo del plan y reactiva."""
     hoy = date.today()
     base = tenant.proximo_cobro if tenant.proximo_cobro and tenant.proximo_cobro > hoy else hoy
-    tenant.proximo_cobro = _add_one_month(base)
+    tenant.proximo_cobro = _add_months(base, _plan_meses(tenant))
     tenant.activo = True
     tenant.save(update_fields=["proximo_cobro", "activo"])
     return tenant
@@ -116,12 +124,57 @@ def tenant_reset_owner_password(*, tenant: Tenant) -> str:
     return password
 
 
+# ---------------- Planes (plataforma) ----------------
+def _set_plan_modulos(plan: Plan, claves: list[str]) -> None:
+    plan.modulos.set(Modulo.objects.filter(clave__in=claves))
+
+
+def plan_create(*, nombre: str, precio_base: Decimal, descripcion: str = "", ciclo: str = "anual", modulos: list[str] | None = None) -> Plan:
+    plan = Plan.objects.create(nombre=nombre, precio_base=precio_base, descripcion=descripcion, ciclo=ciclo)
+    _set_plan_modulos(plan, modulos or [])
+    return plan
+
+
+def plan_update(*, plan: Plan, **fields: Any) -> Plan:
+    claves = fields.pop("modulos", None)
+    for key, value in fields.items():
+        setattr(plan, key, value)
+    plan.save()
+    if claves is not None:
+        _set_plan_modulos(plan, claves)
+    return plan
+
+
+def plan_delete(*, plan: Plan) -> None:
+    try:
+        plan.delete()
+    except ProtectedError:
+        raise ValidationError("No se puede borrar: hay suscripciones que usan este plan.")
+
+
+def _sync_modulos_to_plan(tenant: Tenant) -> None:
+    """Activa EXACTAMENTE los módulos del plan asignado (desactiva los que no incluye)."""
+    incluidos = set(tenant.plan.modulos.values_list("id", flat=True)) if tenant.plan else set()
+    for m in Modulo.objects.all():
+        tm, _ = TenantModulo.objects.get_or_create(
+            tenant=tenant, modulo=m, defaults={"activo": False, "precio_aplicado": 0}
+        )
+        activo = m.id in incluidos
+        if tm.activo != activo:
+            tm.activo = activo
+            if activo:
+                tm.precio_aplicado = m.precio_addon
+            tm.save(update_fields=["activo", "precio_aplicado"])
+
+
 def tenant_admin_update(*, tenant: Tenant, **fields: Any) -> Tenant:
     """Ajustes de plataforma de un negocio: nombre, tipo, modo y plan.
-    El estado 'activo' y la identidad (slug/id) NO se tocan por aquí."""
+    El estado 'activo' y la identidad (slug/id) NO se tocan por aquí.
+    Al cambiar el plan, sincroniza los módulos del negocio con los del plan."""
     bad = set(fields) & _TENANT_ADMIN_IMMUTABLE
     if bad:
         raise ValidationError(f"No se pueden modificar los campos: {', '.join(sorted(bad))}.")
+    sync_plan = False
     if "plan_id" in fields:
         plan_id = fields.pop("plan_id")
         if plan_id is None:
@@ -131,10 +184,16 @@ def tenant_admin_update(*, tenant: Tenant, **fields: Any) -> Tenant:
                 tenant.plan = Plan.objects.get(id=plan_id)
             except Plan.DoesNotExist:
                 raise ValidationError("El plan indicado no existe.")
+        sync_plan = True
     for key, value in fields.items():
         setattr(tenant, key, value)
     tenant.full_clean(exclude=["plan"])
     tenant.save()
+    if sync_plan:
+        _sync_modulos_to_plan(tenant)
+        # Asignar un plan inicia su periodo: fija el próximo cobro a hoy + ciclo.
+        tenant.proximo_cobro = _add_months(date.today(), _plan_meses(tenant)) if tenant.plan else None
+        tenant.save(update_fields=["proximo_cobro"])
     return tenant
 
 

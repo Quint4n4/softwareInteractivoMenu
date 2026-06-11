@@ -18,6 +18,7 @@ from rest_framework.views import APIView
 from .permissions import IsPlatformAdmin
 from .selectors import (
     modulo_list,
+    plan_get,
     plan_list,
     platform_stats,
     tenant_get_any,
@@ -28,6 +29,7 @@ from .serializers import (
     AdminTenantOutput,
     AdminTenantUpdateInput,
     ModuloOutput,
+    PlanInput,
     PlanOutput,
     RegisterInput,
     TenantModuloOverviewSerializer,
@@ -35,6 +37,9 @@ from .serializers import (
 )
 from .services import (
     owner_register,
+    plan_create,
+    plan_delete,
+    plan_update,
     tenant_admin_update,
     tenant_reactivate,
     tenant_register_payment,
@@ -117,6 +122,26 @@ class AdminPlanListApi(APIView):
 
     def get(self, request: Request) -> Response:
         return Response(PlanOutput(plan_list(), many=True).data)
+
+    def post(self, request: Request) -> Response:
+        s = PlanInput(data=request.data)
+        s.is_valid(raise_exception=True)
+        plan = plan_create(**s.validated_data)
+        return Response(PlanOutput(plan).data, status=status.HTTP_201_CREATED)
+
+
+class AdminPlanDetailApi(APIView):
+    permission_classes = PLATFORM_PERMS
+
+    def patch(self, request: Request, pk: int) -> Response:
+        s = PlanInput(data=request.data, partial=True)
+        s.is_valid(raise_exception=True)
+        plan = plan_update(plan=plan_get(plan_id=pk), **s.validated_data)
+        return Response(PlanOutput(plan).data)
+
+    def delete(self, request: Request, pk: int) -> Response:
+        plan_delete(plan=plan_get(plan_id=pk))
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class AdminStatsApi(APIView):

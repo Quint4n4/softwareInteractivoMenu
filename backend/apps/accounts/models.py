@@ -79,9 +79,15 @@ class Membership(TimeStamped):
 
 
 class Plan(TimeStamped):
+    class Ciclo(models.TextChoices):
+        PRUEBA = "prueba", "Prueba (3 meses)"
+        ANUAL = "anual", "Anual"
+
     nombre = models.CharField(max_length=60)
     precio_base = models.DecimalField(max_digits=10, decimal_places=2)
     descripcion = models.TextField(blank=True)
+    ciclo = models.CharField(max_length=10, choices=Ciclo.choices, default=Ciclo.ANUAL)
+    modulos = models.ManyToManyField("Modulo", blank=True, related_name="planes")
 
     def __str__(self):
         return self.nombre
@@ -96,6 +102,12 @@ class Modulo(TimeStamped):
         ORDER_PAY = "order_pay", "Order & Pay"
         RESERVAS = "reservas", "Reservas"
         FIDELIDAD = "fidelidad", "Fidelización"
+        PROMOCIONES = "promociones", "Promociones y cupones"
+        RESENAS = "resenas", "Reseñas y calificaciones"
+        WHATSAPP = "whatsapp", "Notificaciones WhatsApp"
+        REPORTES = "reportes", "Reportes y analítica"
+        INVENTARIO = "inventario", "Inventario y stock"
+        SUCURSALES = "sucursales", "Multi-sucursal"
 
     clave = models.CharField(max_length=20, choices=Clave.choices, unique=True)
     nombre = models.CharField(max_length=60)

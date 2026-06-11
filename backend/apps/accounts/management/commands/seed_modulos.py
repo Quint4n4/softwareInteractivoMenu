@@ -23,6 +23,18 @@ MODULOS: list[dict[str, Any]] = [
      "descripcion": "Reserva de mesas.", "precio_addon": "0"},
     {"clave": Modulo.Clave.FIDELIDAD, "nombre": "Fidelización",
      "descripcion": "Programa de lealtad para clientes.", "precio_addon": "0"},
+    {"clave": Modulo.Clave.PROMOCIONES, "nombre": "Promociones y cupones",
+     "descripcion": "Descuentos y códigos de promoción para tus clientes.", "precio_addon": "590"},
+    {"clave": Modulo.Clave.RESENAS, "nombre": "Reseñas y calificaciones",
+     "descripcion": "Tus clientes califican y reseñan tus platillos.", "precio_addon": "390"},
+    {"clave": Modulo.Clave.WHATSAPP, "nombre": "Notificaciones WhatsApp",
+     "descripcion": "Avisos y tickets al cliente por WhatsApp.", "precio_addon": "790"},
+    {"clave": Modulo.Clave.REPORTES, "nombre": "Reportes y analítica",
+     "descripcion": "Ventas, platillos top y tendencias del negocio.", "precio_addon": "990"},
+    {"clave": Modulo.Clave.INVENTARIO, "nombre": "Inventario y stock",
+     "descripcion": "Control de existencias por platillo/producto.", "precio_addon": "890"},
+    {"clave": Modulo.Clave.SUCURSALES, "nombre": "Multi-sucursal",
+     "descripcion": "Administra varias sucursales del mismo negocio.", "precio_addon": "1490"},
 ]
 
 
