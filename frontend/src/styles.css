@@ -1,12 +1,17 @@
 /* Estilos SOLO de la pantalla de login. El panel usa panel.css + admin.css. */
 .login-root {
-  --accent: #6f4a35;
-  --bg: #f7f3ee;
-  --line: #e7ded5;
-  --ink: #2b2320;
+  --accent: #f97316;
+  --bg: #fff7ee;
+  --line: rgba(120, 80, 30, 0.14);
+  --ink: #2a2520;
   --muted: #8a7d74;
   --danger: #b3392f;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  min-height: 100vh;
+  background:
+    linear-gradient(160deg, rgba(255, 244, 230, 0.28), rgba(255, 228, 205, 0.12)),
+    url("/login-bg.jpg") center center / cover no-repeat;
+  background-attachment: fixed;
 }
 
 .center {
@@ -17,42 +22,57 @@
 }
 
 .authcard {
-  background: #fff;
-  border: 1px solid var(--line);
-  border-radius: 16px;
-  padding: 28px;
+  background: rgba(38, 32, 36, 0.30);
+  backdrop-filter: blur(20px) saturate(135%);
+  -webkit-backdrop-filter: blur(20px) saturate(135%);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: 26px;
+  padding: 40px 38px;
   width: 100%;
-  max-width: 380px;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.05);
+  max-width: 460px;
+  box-shadow: 0 30px 70px -25px rgba(40, 25, 10, 0.45);
 }
-.auth { display: flex; flex-direction: column; gap: 12px; text-align: center; }
-.auth h1 { margin: 4px 0 0; font-size: 22px; color: var(--ink); }
-.auth p { margin: 0 0 8px; color: var(--muted); }
+.auth { display: flex; flex-direction: column; gap: 14px; text-align: center; }
+.auth h1 { margin: 6px 0 0; font-size: 26px; color: #fff; font-weight: 800; letter-spacing: 0.01em; }
+.auth__sub { margin: 0 0 10px; color: rgba(255, 255, 255, 0.82); font-size: 14px; }
 
 .brandmark {
   width: 48px; height: 48px; border-radius: 12px;
-  background: var(--accent); color: #fff;
+  background: linear-gradient(135deg, #f97316, #fb923c); color: #fff;
   display: grid; place-items: center;
   font-weight: 800; font-size: 22px; margin: 0 auto;
 }
 
-.auth label { display: flex; flex-direction: column; gap: 6px; text-align: left; font-size: 13px; font-weight: 700; color: var(--muted); }
-.auth input {
-  padding: 11px 12px; border: 1px solid var(--line); border-radius: 10px;
-  font-size: 15px; color: var(--ink); background: #fff;
+.auth-field { position: relative; display: flex; align-items: center; }
+.auth-input {
+  width: 100%; padding: 14px 18px; border: 1px solid rgba(255, 255, 255, 0.30);
+  border-radius: 999px; font-size: 15px; color: #fff;
+  background: rgba(255, 255, 255, 0.14);
 }
-.auth input:focus { outline: 2px solid var(--accent); border-color: transparent; }
+.auth-input::placeholder { color: rgba(255, 255, 255, 0.72); }
+.auth-input:focus { outline: none; border-color: rgba(255, 255, 255, 0.65); background: rgba(255, 255, 255, 0.20); }
+.auth-field:has(.auth-eye) .auth-input { padding-right: 48px; }
+.auth-eye {
+  position: absolute; right: 9px; top: 50%; transform: translateY(-50%);
+  width: 34px; height: 34px; display: grid; place-items: center;
+  background: none; border: 0; border-radius: 50%; cursor: pointer; color: rgba(255, 255, 255, 0.85);
+}
+.auth-eye:hover { color: #fff; background: rgba(255, 255, 255, 0.14); }
 
-.auth button[type="submit"] {
-  margin-top: 6px; padding: 12px; border: 0; border-radius: 10px;
-  background: var(--accent); color: #fff; font-weight: 800; font-size: 15px; cursor: pointer;
+.auth__submit {
+  margin-top: 8px; padding: 14px; border: 0; border-radius: 999px;
+  background: linear-gradient(135deg, #f97316, #fb923c); color: #fff;
+  font-weight: 800; font-size: 15px; letter-spacing: 0.04em; cursor: pointer;
+  box-shadow: 0 10px 24px -8px rgba(249, 115, 22, 0.6);
 }
-.auth button[type="submit"]:disabled { opacity: 0.6; cursor: default; }
+.auth__submit:disabled { opacity: 0.6; cursor: default; }
 
 .auth .link {
-  background: none; border: 0; color: var(--accent);
+  background: none; border: 0; color: #fff;
   font-weight: 700; cursor: pointer; font-size: 13.5px; padding: 4px;
+  text-decoration: underline; text-underline-offset: 3px;
 }
+.auth .link:hover { color: rgba(255, 255, 255, 0.8); }
 
 .error {
   background: #fbe9e7; color: var(--danger); border: 1px solid #f3c7c2;
