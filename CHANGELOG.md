@@ -8,6 +8,38 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es/1.0.0/).
 
 ---
 
+## [0.4.0] — 2026-06-11
+
+### Añadido
+
+**Super-admin — Planes con módulos y ciclo de cobro**
+- Los **planes** ahora son paquetes de **módulos (plugins)** a un precio. Botón **"Planes"** para crear/editar/borrar planes, marcando con casillas qué módulos incluye cada uno.
+- Cada plan tiene un **ciclo de cobro**: **Prueba (3 meses)** o **Anual (12 meses)**. Ya no hay planes mensuales.
+- Al **asignar un plan** a un negocio se activan **exactamente** sus módulos y se fija el próximo cobro a hoy + el ciclo.
+- **"Registrar pago"** avanza el próximo cobro según el ciclo (3 o 12 meses), no un mes fijo.
+- El **MRR** se calcula como ingreso mensual equivalente (precio anual ÷ 12; la prueba aporta $0).
+- Cuatro planes de ejemplo (`seed_planes`): Prueba, Básico, Pro, Premium.
+
+**Super-admin — Más plugins**
+- El catálogo pasó de 5 a **11 módulos**: se agregaron Promociones y cupones, Reseñas y calificaciones, Notificaciones WhatsApp, Reportes y analítica, Inventario y stock y Multi-sucursal.
+- **Extras à la carte**: además de los del plan, se pueden activar plugins sueltos por negocio (botón "Gestionar").
+
+**Super-admin — Rediseño glass y tarjeta de negocio**
+- Rediseño visual **glassmorphism** (acento naranja, tarjetas esmeriladas, fondo de imagen) en el tablero, con **gráfica de ventas** (6 meses), **4ª tarjeta "Por cobrar este mes"** y **calendario de cobros**.
+- La tarjeta de cada negocio se reorganizó en secciones (**Plan · Cobro · Plugins**) con los **plugins activos visibles como chips** y una barra de acciones aparte.
+
+**Login — Rediseño glass**
+- Login con estilo **glassmorphism** (tarjeta traslúcida, inputs tipo píldora), **botón para ver la contraseña**, y **fondo de imagen** tanto en el login como en el dashboard.
+
+**Interfaz**
+- Todas las confirmaciones nativas del navegador (`confirm`) se reemplazaron por **modales** propios (`ConfirmProvider` / `useConfirm`).
+
+### Técnico
+- Migraciones `accounts`: `0004_plan_modulos` (M2M plan↔módulos), `0005_alter_modulo_clave` (nuevos plugins), `0006_plan_ciclo`.
+- `AdminTenantOutput` incluye `modulos_activos` (con prefetch, sin N+1).
+
+---
+
 ## [0.3.0] — 2026-06-11
 
 ### Añadido

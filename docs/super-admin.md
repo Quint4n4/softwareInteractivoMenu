@@ -20,10 +20,11 @@ Al cargar el panel, arriba de la lista de negocios aparecen tres tarjetas de res
 | Tarjeta | Qué muestra |
 |---------|-------------|
 | **Negocios** | total · activos · vencidos |
-| **Ingreso mensual (MRR)** | suma de los precios de planes y add-ons de negocios activos |
+| **Ingreso mensual (MRR)** | ingreso mensual equivalente de negocios activos (precio anual ÷ 12; la prueba aporta $0) |
 | **Ventas de la plataforma** | suma de todos los pedidos no cancelados de todos los negocios + número de pedidos |
+| **Por cobrar este mes** | suma de planes de negocios vencidos o que vencen este mes |
 
-Estos datos los devuelve el endpoint `GET /api/admin/stats/`.
+Estos datos los devuelve el endpoint `GET /api/admin/stats/`. Debajo de las tarjetas hay una **gráfica de ventas** (últimos 6 meses) y un **calendario de cobros** que resalta los días en que vence algún negocio.
 
 ## Qué puede hacer
 
@@ -33,8 +34,10 @@ Desde el panel verás la lista de todos los negocios, y por cada uno:
 |--------|------|
 | **Ver** nombre, estado, enlace de vitrina y correo del dueño | en la tarjeta |
 | **Suspender / Activar** | botón (la vitrina lo respeta al instante) |
-| **Asignar plan** | menú desplegable |
-| **Activar/desactivar módulos** | botón "Módulos" → interruptores |
+| **Asignar plan** | menú desplegable (activa los módulos del plan y fija el próximo cobro) |
+| **Ver plugins activos** | chips en la propia tarjeta (sin abrir nada) |
+| **Activar extras (plugins) sueltos** | botón "Gestionar" → interruptores |
+| **Crear/editar planes** | botón **"Planes"** (ver sección "Planes") |
 | **Dar de alta un negocio** | botón "Nuevo negocio" (crea el negocio + su dueño) |
 | **Resetear contraseña del dueño** | botón "Contraseña" → se genera y muestra una contraseña temporal |
 
@@ -52,7 +55,7 @@ Cada tarjeta de negocio muestra una fila de suscripción con tres elementos:
 
 **Próximo cobro** — campo de calendario editable. Al cambiar la fecha se guarda de inmediato vía `PATCH /api/admin/negocios/<id>/` con el campo `proximo_cobro`.
 
-**Botón "Registrar pago"** — llama a `POST /api/admin/negocios/<id>/pago/`. Adelanta `proximo_cobro` exactamente un mes y, si el negocio estaba suspendido, lo reactiva en ese mismo paso.
+**Botón "Registrar pago"** — llama a `POST /api/admin/negocios/<id>/pago/`. Adelanta `proximo_cobro` según el **ciclo del plan** (prueba: 3 meses · anual: 12 meses) y, si el negocio estaba suspendido, lo reactiva en ese mismo paso. Al **asignar un plan** también se fija automáticamente el próximo cobro a hoy + el ciclo.
 
 > La **suspensión automática** al vencerse la fecha aún no existe: requiere una tarea programada (cron). Por ahora el estado `Vencido` es solo informativo; la suspensión la hace manualmente el super-admin con el botón "Suspender". Se implementará en el despliegue a producción.
 
@@ -60,17 +63,39 @@ Cada tarjeta de negocio muestra una fila de suscripción con tres elementos:
 
 El botón **"Contraseña"** en cada tarjeta llama a `POST /api/admin/negocios/<id>/reset-password/`. El backend genera una contraseña temporal segura y la devuelve en un modal con botón "Copiar". El super-admin se la comparte al dueño por el canal que prefiera; el dueño puede cambiarla al entrar desde su perfil.
 
-## Módulos / add-ons
+## Planes
 
-Los módulos son funciones que se activan por negocio (modelo `TenantModulo`). El estándar
-incluye: **Menú** (base), **Catálogo** (add-on de pago), Order & Pay, Reservas,
-Fidelización.
+Un **plan** es un paquete de módulos a un precio y un ciclo de cobro. Se gestionan con el
+botón **"Planes"** (crear, editar, borrar):
 
-- Al **activar el Catálogo** para un negocio, su dueño verá la pestaña **Catálogo** en su
-  panel y podrá crear productos; y la vitrina podrá mostrar la **tienda**.
-- El precio del add-on se toma del módulo (ej. Catálogo: $199).
+| Campo | Detalle |
+|-------|---------|
+| **Nombre** | ej. Básico, Pro, Premium |
+| **Tipo de cobro (ciclo)** | **Prueba** (3 meses) o **Anual** (12 meses) |
+| **Precio** | lo que se cobra por ciclo (la prueba suele ir en 0) |
+| **Módulos incluidos** | casillas con los plugins que trae el plan |
 
-El catálogo de módulos se crea con:
+Al **asignar un plan** a un negocio se activan **exactamente** sus módulos y se fija el
+próximo cobro. Endpoints: `POST /api/admin/planes/`, `PATCH`/`DELETE /api/admin/planes/<id>/`.
+
+Cuatro planes de ejemplo se crean con:
+```bash
+docker compose exec backend python manage.py seed_planes
+```
+
+## Módulos / plugins
+
+Los módulos (plugins) son funciones que se activan por negocio (modelo `TenantModulo`).
+El catálogo trae **11**: Menú, Catálogo, Order & Pay, Reservas, Fidelización,
+Promociones y cupones, Reseñas y calificaciones, Notificaciones WhatsApp,
+Reportes y analítica, Inventario y stock y Multi-sucursal.
+
+- Los módulos que trae el **plan** se activan solos al asignarlo.
+- Además, el super-admin puede activar **extras** sueltos por negocio con el botón
+  **"Gestionar"** (se reinician si se reasigna el plan).
+- Al **activar el Catálogo**, el dueño ve la pestaña **Catálogo** y la vitrina muestra la **tienda**.
+
+El catálogo de módulos se crea/actualiza con:
 ```bash
 docker compose exec backend python manage.py seed_modulos
 ```
