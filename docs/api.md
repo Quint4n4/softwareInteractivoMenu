@@ -104,12 +104,48 @@ Requieren `IsPlatformAdmin` (super-usuario de Django). Operan sobre **todos** lo
 |--------|------|-------------|
 | GET | `/admin/negocios/` | Lista todos los negocios |
 | POST | `/admin/negocios/` | Da de alta un negocio (crea su dueño) |
-| GET/PATCH | `/admin/negocios/<uuid>/` | Detalle / editar (incluye asignar `plan_id`) |
+| GET/PATCH | `/admin/negocios/<uuid>/` | Detalle / editar (incluye `plan_id` y `proximo_cobro`) |
 | POST | `/admin/negocios/<uuid>/suspender/` | Suspende el negocio |
 | POST | `/admin/negocios/<uuid>/reactivar/` | Reactiva el negocio |
+| POST | `/admin/negocios/<uuid>/pago/` | Registra pago: adelanta `proximo_cobro` un mes y reactiva; devuelve el negocio |
+| POST | `/admin/negocios/<uuid>/reset-password/` | Genera contraseña temporal del dueño; devuelve `{ password }` |
 | GET | `/admin/negocios/<uuid>/modulos/` | Módulos del negocio y su estado |
 | POST | `/admin/negocios/<uuid>/modulos/` | Activa/desactiva un módulo (`{clave, activo}`) |
 | GET | `/admin/modulos/` | Catálogo de módulos disponibles |
 | GET | `/admin/planes/` | Lista de planes |
+| GET | `/admin/stats/` | Métricas globales de la plataforma (tablero del super-admin) |
 
 > Un dueño normal recibe **403** en cualquier ruta `/api/admin/`; sin sesión, **401**.
+
+### `GET /admin/stats/`
+
+Devuelve un objeto con las métricas globales de la plataforma:
+
+```json
+{
+  "negocios_total": 12,
+  "negocios_activos": 9,
+  "negocios_suspendidos": 2,
+  "negocios_vencidos": 1,
+  "mrr": "3580.00",
+  "ventas_total": "142300.50",
+  "pedidos_total": 874
+}
+```
+
+- `mrr`: suma de los precios de planes y add-ons de los negocios activos (decimal como string).
+- `ventas_total`: suma de todos los pedidos no cancelados de todos los negocios (decimal como string).
+- `negocios_vencidos`: negocios cuya `proximo_cobro` ya pasó (independientemente de si están activos o suspendidos).
+
+### Campos de `AdminTenantOutput`
+
+Además de los campos base, cada negocio en la respuesta de `/admin/negocios/` incluye:
+
+| Campo | Tipo | Descripción |
+|-------|------|-------------|
+| `num_mesas` | entero | Número de mesas del negocio |
+| `proximo_cobro` | fecha (`YYYY-MM-DD`) o `null` | Fecha del próximo cobro de la suscripción |
+| `estado_pago` | string | `prueba` / `al_corriente` / `vencido` (calculado por el backend) |
+| `owner_email` | string o `null` | Correo del dueño principal |
+
+`AdminTenantUpdateInput` (PATCH) acepta `proximo_cobro` (fecha o `null`) además de `plan_id`, `tipo_negocio` y `modo_vitrina`.

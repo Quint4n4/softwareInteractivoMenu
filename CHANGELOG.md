@@ -8,6 +8,54 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es/1.0.0/).
 
 ---
 
+## [0.3.0] — 2026-06-11
+
+### Añadido
+
+**Panel del dueño — QR y Mesas (fusionado)**
+- La sección lateral **"Mesas"** desaparece; queda una sola sección **"QR y Mesas"** que agrupa en pantalla el QR general arriba y los QR por mesa abajo.
+- El QR general se reetiqueta como **"QR general (para llevar y compartir)"**: sirve para pedidos para llevar, publicarlo en redes sociales o ponerlo en la puerta/mostrador (antes el texto decía "ponlo en tus mesas", lo que era incorrecto).
+- Los QR de mesa siguen generándose igual: uno por cada mesa, apuntando a `/v/<slug>?mesa=N`.
+
+**Panel del dueño — Ventas**
+- Cada pedido en la lista de Ventas tiene ahora un botón **"Ver"** que abre un modal con la **orden completa**: platillos (cantidad, nota, importe), subtotal, propina, total, y los botones Imprimir y WhatsApp dentro del propio modal.
+
+**Super-admin — Tablero de plataforma**
+- Tres tarjetas de resumen al inicio del panel de plataforma:
+  - **Negocios**: total de negocios · activos · vencidos.
+  - **Ingreso mensual (MRR)**: suma de los precios de planes y add-ons de los negocios activos.
+  - **Ventas de la plataforma**: suma de todos los pedidos no cancelados de todos los negocios + número de pedidos.
+- Alimentado por el nuevo endpoint `GET /api/admin/stats/`.
+
+**Super-admin — Cobros / Suscripciones**
+- Cada tarjeta de negocio muestra ahora una fila de suscripción con:
+  - **Estado de pago** (chip): `Prueba` (sin fecha registrada), `Al corriente` (fecha futura), `Vencido` (fecha ya pasada).
+  - **Próximo cobro**: campo de fecha editable (calendario); se guarda vía `PATCH /api/admin/negocios/<id>/`.
+  - **Botón "Registrar pago"**: adelanta `proximo_cobro` exactamente un mes y reactiva el negocio si estaba suspendido; llama a `POST /api/admin/negocios/<id>/pago/`.
+
+**Super-admin — Soporte / Reset de contraseña**
+- Botón **"Contraseña"** en cada tarjeta de negocio: genera una contraseña temporal segura para el dueño y la muestra al super-admin en un modal con botón "Copiar". El dueño puede cambiarla al entrar. Llama a `POST /api/admin/negocios/<id>/reset-password/`.
+
+**Backend**
+- Campo `Tenant.proximo_cobro` (`DateField`, opcional/nulo): fecha del próximo cobro de la suscripción. Migración `accounts/0003_tenant_proximo_cobro`.
+- `AdminTenantOutput` expone `proximo_cobro` y el campo derivado `estado_pago` (`prueba` / `al_corriente` / `vencido`).
+- `AdminTenantUpdateInput` acepta `proximo_cobro` en el `PATCH`.
+- Endpoint `GET /api/admin/stats/` (`IsPlatformAdmin`): devuelve `{ negocios_total, negocios_activos, negocios_suspendidos, negocios_vencidos, mrr, ventas_total, pedidos_total }`.
+- Endpoint `POST /api/admin/negocios/<id>/pago/` (`IsPlatformAdmin`): registra pago, adelanta `proximo_cobro` un mes, reactiva el negocio y devuelve el negocio actualizado.
+- Endpoint `POST /api/admin/negocios/<id>/reset-password/` (`IsPlatformAdmin`): genera contraseña temporal y devuelve `{ password }`.
+
+### Cambiado
+
+- La entrada lateral "QR" y "Mesas" son ahora una sola entrada **"QR y Mesas"** en el menú lateral del panel del dueño.
+- El título de la sección QR cambia de "Código QR de tu vitrina" a "QR general (para llevar y compartir)" para distinguirlo de los QR por mesa.
+
+### Pendiente conocido
+
+- **Suspensión automática de negocios vencidos**: el campo `proximo_cobro` y el estado `vencido` ya existen, pero la suspensión automática requiere una tarea programada (cron/Celery beat). Se implementará en el despliegue a producción.
+- **Token JWT del dueño en `localStorage`**: pendiente de migrar a cookies `httpOnly` al desplegar con HTTPS (ver entrada [0.2.0] para contexto).
+
+---
+
 ## [0.2.0] — 2026-06-10
 
 ### Añadido

@@ -31,15 +31,22 @@ Identidad visual de la vitrina:
 
 > El selector de tipografía se quitó en esta versión; la fuente del admin es fija.
 
-## QR
+## QR y Mesas
 
-Genera el **código QR** de la vitrina del negocio. Se puede **descargar en PNG** y copiar el enlace. Se imprime y se pone en el mostrador.
+Esta sección agrupa dos tipos de código QR en una sola pantalla:
 
-## Mesas
+**QR general (para llevar y compartir)** — parte superior
 
-Genera un **QR descargable por cada mesa**. Cada código apunta a `/v/<slug>?mesa=N`, de modo que cuando el cliente lo escanea, la bienvenida llega con la mesa ya prellenada.
+- Apunta a `/v/<slug>` sin parámetro de mesa.
+- Úsalo para pedidos **para llevar**, compartir el menú en redes sociales o pegarlo en la puerta/mostrador.
+- Se puede **descargar en PNG** y copiar el enlace.
 
-Para configurar el número de mesas: edita el campo **num_mesas** en la sección **Marca** y guarda. Luego vuelve a **Mesas** para ver y descargar los QR generados.
+**QR por mesa** — parte inferior
+
+- Genera un **QR descargable por cada mesa**. Cada código apunta a `/v/<slug>?mesa=N`, de modo que cuando el cliente lo escanea, la bienvenida llega con la mesa ya prellenada.
+- Para configurar el número de mesas: edita el campo **num_mesas** en la sección **Marca** y guarda. Los QR aparecen de inmediato en esta misma sección.
+
+> Antes "QR" y "Mesas" eran dos entradas separadas en el menú lateral. Desde la versión 0.3.0 son una sola sección.
 
 ## Cocina
 
@@ -73,6 +80,7 @@ Resumen de actividad del negocio:
 
 - **Tarjetas de resumen:** ventas totales, número de pedidos, ticket promedio.
 - **Lista de pedidos** con detalle de artículos, cliente y mesa.
+- **Botón Ver:** abre un modal con la **orden completa**: lista de platillos con cantidad, nota e importe por línea; subtotal, propina y total. Dentro del modal están los botones Imprimir y WhatsApp.
 - **Botón Imprimir:** imprime / guarda como PDF el ticket del pedido desde el navegador.
 - **Botón WhatsApp:** abre `wa.me` con el ticket pre-escrito para enviarlo al WhatsApp del cliente. Se deshabilita si el pedido no tiene teléfono registrado.
 
