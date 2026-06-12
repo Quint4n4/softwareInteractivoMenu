@@ -1,10 +1,36 @@
-# Changelog — Vitrina Digital
+# Changelog — Qarta
 
 Formato basado en [Keep a Changelog](https://keepachangelog.com/es/1.0.0/).
 
 ---
 
 ## [Sin publicar]
+
+---
+
+## [0.5.0] — 2026-06-12
+
+### Marca — nace "Qarta"
+
+El producto se renombra de **"Vitrina Digital"** a **Qarta** (de QR + carta; *"tu carta, en un QR"*).
+
+**Identidad**
+- **Logo**: una lupa sonriente naranja (buscar/ver la carta). Archivos transparentes en `frontend/public/`: `QartaLogo.png` (logo completo), `qarta-icon.png` (solo ícono).
+- **Mascota "Qito"**: la misma lupa convertida en personaje amigable (`qito.png`, optimizada de 917 KB a ~70 KB).
+- A los PNG con fondo blanco se les quitó el fondo con flood-fill (Pillow) conservando el blanco interior (la carita).
+
+**Integración en el menú del cliente**
+- **Splash** con el logo Qarta mientras carga el menú.
+- **Qito** en la bienvenida (saludando), en la orden vacía y en un banner de "¡Gracias por tu compra!" al pedir.
+- Pie **"Hecho con Qarta"** en todas las pantallas. La marca del restaurante sigue siendo la protagonista; Qarta aparece discreto.
+
+**Rebrand de la plataforma**
+- Login con el **ícono del logo** + "Qarta", botón de **ver contraseña** e inputs tipo píldora (estilo glass).
+- Headers del panel del dueño y del super-admin con Qito + "Qarta".
+- Título de la pestaña "Qarta — Panel" y **favicon** de Qito.
+
+**Docs**
+- Nueva guía de marca: [docs/marca.md](docs/marca.md).
 
 ---
 

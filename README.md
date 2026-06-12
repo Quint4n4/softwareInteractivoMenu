@@ -1,4 +1,6 @@
-# AgencySoftware — Vitrina Digital (SaaS multi-tenant)
+# Qarta — menú digital por QR (SaaS multi-tenant)
+
+> Nombre interno del repo: `AgencySoftware`. El producto se llama **Qarta** (*tu carta, en un QR*).
 
 Monorepo dockerizado. Backend Django + DRF, frontend React + TypeScript (Vite),
 base de datos PostgreSQL. Todo corre en contenedores con un solo comando.

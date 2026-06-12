@@ -1,6 +1,6 @@
-# Documentación — Vitrina Digital (AgencySoftware)
+# Documentación — Qarta
 
-**Vitrina Digital** es un SaaS multi-tenant para restaurantes y comercios: cada
+**Qarta** (*tu carta, en un QR*) es un SaaS multi-tenant para restaurantes y comercios: cada
 negocio tiene su **menú/catálogo digital por QR**, su panel para administrarlo, y
 una plataforma central para dar de alta clientes y vender módulos (add-ons).
 
@@ -18,6 +18,7 @@ una plataforma central para dar de alta clientes y vender módulos (add-ons).
 | [vitrina-publica.md](vitrina-publica.md) | La vitrina que ve el cliente: menú, tienda, idiomas, QR, pedidos |
 | [super-admin.md](super-admin.md) | Panel de plataforma: alta de negocios, planes y módulos (add-ons) |
 | [desarrollo.md](desarrollo.md) | Cómo correr, pruebas, comandos de datos de demo, variables de entorno |
+| [marca.md](marca.md) | Identidad de Qarta: nombre, logo, ícono, mascota Qito, colores y dónde se usan |
 
 ## Arranque rápido
 
