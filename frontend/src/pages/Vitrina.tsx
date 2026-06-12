@@ -26,6 +26,15 @@ function money(n: number, c = "$"): string {
 }
 
 /* ---------------- Language switch ---------------- */
+function PoweredBy() {
+  return (
+    <div className="v-powered">
+      <img src="/qito.png" alt="" className="v-powered__qito" aria-hidden="true" />
+      <span>Hecho con <b>Qarta</b></span>
+    </div>
+  );
+}
+
 function LangSwitch({ lang, idiomas, onChange, right }: {
   lang: string; idiomas: string[]; onChange: (l: string) => void; right?: boolean;
 }) {
@@ -142,6 +151,7 @@ function WelcomeScreen({ nombreNegocio, mesaParam, onStart, ui }: { nombreNegoci
   }
   return (
     <form onSubmit={submit} style={{ padding: "26px 20px" }}>
+      <img src="/qito.png" alt="" className="v-qito v-qito--wave" aria-hidden="true" />
       <div className="v-hero__script" style={{ color: "var(--v-accent)", fontSize: 30 }}>{ui.hi}</div>
       <div className="v-title" style={{ fontSize: 26 }}>{ui.welcomeTo} {nombreNegocio}</div>
       <p className="v-cta-note" style={{ textAlign: "left", margin: "8px 0 18px" }}>{ui.welcomeNote}</p>
@@ -273,7 +283,7 @@ function CheckoutScreen({ lines, subtotal, guest, busy, onAdd, onDec, onRemove, 
   if (lines.length === 0) {
     return (
       <div className="v-placeholder">
-        <div className="v-emoji">📝</div>
+        <img src="/qito.png" alt="" className="v-qito" aria-hidden="true" />
         <div className="v-title">{ui.cartEmpty}</div>
         <p>{ui.cartEmptyNote}</p>
         <button className="v-btn" style={{ maxWidth: 200, marginTop: 8 }} onClick={() => goMenu()}>{ui.seeMenu}</button>
@@ -376,6 +386,10 @@ function TrackingScreen({ order, onReorder, onTicket, ui }: { order: Pedido; onR
   const cancelado = order.estado === "cancelado";
   return (
     <div>
+      <div className="v-thanks">
+        <img src="/qito.png" alt="" className="v-qito v-qito--sm" aria-hidden="true" />
+        <span>{ui.thanks}</span>
+      </div>
       <div className="v-top"><span className="v-title">{ui.tracking}</span></div>
 
       <div className="v-eta">
@@ -680,7 +694,14 @@ export default function Vitrina() {
   }
 
   if (error) return <div className="vitrina"><div className="v-placeholder">{error}</div></div>;
-  if (!data) return <div className="vitrina"><div className="v-placeholder">Cargando menú…</div></div>;
+  if (!data) return (
+    <div className="vitrina">
+      <div className="v-splash">
+        <img src="/QartaLogo.png" alt="Qarta" className="v-splash__logo" />
+        <div className="v-splash__hint">Cargando menú…</div>
+      </div>
+    </div>
+  );
 
   // Negocio suspendido por el super-admin: vitrina no disponible.
   if (!data.disponible) {
@@ -706,6 +727,7 @@ export default function Vitrina() {
       <div className="vitrina" style={rootStyle}>
         <div className="v-app" style={{ paddingBottom: 0 }}>
           <WelcomeScreen nombreNegocio={data.negocio.nombre} mesaParam={mesaParam} onStart={startGuest} ui={ui} />
+          <PoweredBy />
         </div>
       </div>
     );
@@ -735,7 +757,7 @@ export default function Vitrina() {
             <TrackingScreen order={order} onReorder={nuevoPedido} onTicket={() => setTicketOpen(true)} ui={ui} />
           ) : (
             <div className="v-placeholder">
-              <div className="v-emoji">🧾</div>
+              <img src="/qito.png" alt="" className="v-qito" aria-hidden="true" />
               <div className="v-title">{ui.noActiveOrders}</div>
               <p>{ui.noActiveOrdersNote}</p>
               <button className="v-btn" style={{ maxWidth: 200, marginTop: 8 }} onClick={() => goMenu()}>{ui.seeMenu}</button>
@@ -743,6 +765,7 @@ export default function Vitrina() {
           )
         )}
 
+        <PoweredBy />
         <TabBar screen={screen} go={setScreen} cartCount={cartCount} ui={ui} />
       </div>
 

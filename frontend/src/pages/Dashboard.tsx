@@ -4,8 +4,8 @@ export default function Dashboard({ me, onLogout }: { me: Me; onLogout: () => vo
   return (
     <div className="shell">
       <header className="topbar">
-        <div className="brandmark sm">V</div>
-        <strong>Vitrina Digital</strong>
+        <img src="/qito.png" alt="" aria-hidden="true" style={{ width: 32, height: 32, objectFit: "contain" }} />
+        <strong>Qarta</strong>
         <button className="link" style={{ marginLeft: "auto" }} onClick={onLogout}>
           Salir
         </button>

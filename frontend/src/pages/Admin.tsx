@@ -587,9 +587,9 @@ export default function Admin({ me, onLogout }: { me: Me; onLogout: () => void }
   return (
     <div className="padmin">
       <header className="padmin__top">
-        <div className="padmin__mark">V</div>
+        <img src="/qito.png" alt="" aria-hidden="true" style={{ width: 38, height: 38, objectFit: "contain", flex: "none" }} />
         <div className="grow" style={{ minWidth: 0 }}>
-          <div style={{ fontWeight: 800, fontSize: 15 }}>Plataforma · Vitrina Digital</div>
+          <div style={{ fontWeight: 800, fontSize: 15 }}>Plataforma · Qarta</div>
           <div className="mute2" style={{ fontSize: 12 }}>Administración de negocios</div>
         </div>
         <span className="muted hide-sm" style={{ fontSize: 13 }}>{me.user.email}</span>

@@ -142,9 +142,9 @@ export default function Panel({ me, onLogout }: { me: Me; onLogout: () => void }
     <div className="admin" style={cssVars}>
       <aside className={"asied" + (navOpen ? " is-open" : "")}>
         <div className="asied__brand">
-          <div className="brand__mark">V</div>
+          <img src="/qito.png" alt="" aria-hidden="true" style={{ width: 38, height: 38, objectFit: "contain", flex: "none" }} />
           <div className="col">
-            <div className="brand__name">Vitrina Digital</div>
+            <div className="brand__name">Qarta</div>
             <div className="brand__sub">Panel del negocio</div>
           </div>
           <button className="iconbtn aclose" style={{ marginLeft: "auto" }} onClick={() => setNavOpen(false)} aria-label="Cerrar">

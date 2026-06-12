@@ -48,8 +48,8 @@ export default function Login({ onAuthed }: { onAuthed: (me: Me) => void }) {
   return (
     <div className="center login-root">
       <form className="authcard auth" onSubmit={submit}>
-        <div className="brandmark">V</div>
-        <h1>{mode === "login" ? "Bienvenido" : "Crea tu negocio"}</h1>
+        <img src="/qarta-icon.png" alt="Qarta" style={{ width: 88, height: "auto", display: "block", margin: "0 auto 4px" }} />
+        <h1>{mode === "login" ? "Qarta" : "Crea tu negocio"}</h1>
         <p className="auth__sub">
           {mode === "login" ? "Entra a tu panel" : "Empieza tu vitrina digital"}
         </p>
