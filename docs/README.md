@@ -19,6 +19,7 @@ una plataforma central para dar de alta clientes y vender módulos (add-ons).
 | [super-admin.md](super-admin.md) | Panel de plataforma: alta de negocios, planes y módulos (add-ons) |
 | [desarrollo.md](desarrollo.md) | Cómo correr, pruebas, comandos de datos de demo, variables de entorno |
 | [marca.md](marca.md) | Identidad de Qarta: nombre, logo, ícono, mascota Qito, colores y dónde se usan |
+| [seguridad.md](seguridad.md) | Rate limits, token de pedido y checklist de seguridad para el despliegue |
 
 ## Arranque rápido
 

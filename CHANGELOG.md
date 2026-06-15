@@ -8,6 +8,29 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es/1.0.0/).
 
 ---
 
+## [0.6.0] — 2026-06-15
+
+### Mejorado — UX del menú del cliente (pruebas con usuarios reales)
+- **Bienvenida**: si el QR ya trae la mesa, solo pide el nombre (la mesa viene del QR; ya no se escribe a mano).
+- **Categorías** más grandes y legibles; se quitó el "X opciones".
+- **Tarjetas de producto** más grandes; íconos de la barra inferior más grandes.
+- Botón **"Pedir"** en lugar del "+".
+- **Botón flotante "Ver mi orden"** que aparece al agregar algo, con conteo y total.
+- **Checkout en 3 pasos** guiados (Revisa tu orden → ¿Cómo pagar? → Confirma) en vez de un formulario largo.
+- Botón **"Volver"** visible (con texto) en todo el flujo, no solo una flecha.
+- Pago con tarjeta = **con la terminal en la mesa** (se quitó el pago en línea y la tarjeta guardada).
+
+### Seguridad
+- **Rate limiting** en toda la API (DRF throttling): login **8/min con bloqueo** anti-fuerza-bruta, registro 6/hora, y límites por audiencia (cliente / dueño / super-admin).
+- **Token de pedido opaco**: el seguimiento público ya no usa el número secuencial `A-001`. Antes cualquiera podía enumerar pedidos y ver el nombre y teléfono de otros clientes; ahora se requiere un token no adivinable.
+- **Throttle de pedidos POR RESTAURANTE** (no por IP): inmune a WiFi compartido, datos móviles y CGNAT.
+
+### Técnico
+- Migración `orders/0005_pedido_token`; `apps/orders/throttles.py` (throttles por slug).
+- Nueva guía: [docs/seguridad.md](docs/seguridad.md) con el checklist de seguridad pendiente para el despliegue.
+
+---
+
 ## [0.5.0] — 2026-06-12
 
 ### Marca — nace "Qarta"
