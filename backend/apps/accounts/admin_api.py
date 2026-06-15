@@ -13,6 +13,7 @@ from rest_framework.generics import GenericAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
+from rest_framework.throttling import ScopedRateThrottle
 from rest_framework.views import APIView
 
 from .permissions import IsPlatformAdmin
@@ -111,6 +112,8 @@ class AdminTenantPagoApi(APIView):
 class AdminTenantResetPasswordApi(APIView):
     """Genera una nueva contraseña para el dueño del negocio (soporte)."""
     permission_classes = PLATFORM_PERMS
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = "reset_pw"
 
     def post(self, request: Request, pk: UUID) -> Response:
         password = tenant_reset_owner_password(tenant=tenant_get_any(tenant_id=pk))
@@ -147,6 +150,8 @@ class AdminPlanDetailApi(APIView):
 class AdminStatsApi(APIView):
     """Métricas globales de la plataforma (tablero del super-admin)."""
     permission_classes = PLATFORM_PERMS
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = "stats"
 
     def get(self, request: Request) -> Response:
         return Response(platform_stats())

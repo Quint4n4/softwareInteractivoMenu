@@ -6,8 +6,10 @@ from rest_framework.parsers import FormParser, MultiPartParser
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
+from rest_framework.throttling import ScopedRateThrottle
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.views import TokenObtainPairView
 
 from .permissions import HasTenantAccess
 from .selectors import membership_for_user, tema_get, tenant_active_modulos
@@ -28,8 +30,16 @@ def tokens_for(user) -> dict[str, str]:
     return {"refresh": str(refresh), "access": str(refresh.access_token)}
 
 
+class ThrottledLoginView(TokenObtainPairView):
+    """Login (JWT) con límite de tasa para frenar fuerza bruta de contraseñas."""
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = "login"
+
+
 class RegisterApi(APIView):
     permission_classes = [AllowAny]
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = "register"
 
     def post(self, request: Request) -> Response:
         s = RegisterInput(data=request.data)

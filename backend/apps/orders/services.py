@@ -1,6 +1,7 @@
 """Casos de uso de pedidos (escrituras)."""
 from __future__ import annotations
 
+import secrets
 from decimal import Decimal
 from typing import Any
 
@@ -57,7 +58,7 @@ def pedido_create(
         tenant=tenant, nombre_cliente=nombre_cliente, telefono=telefono, tipo=tipo,
         mesa_texto=mesa_texto, nota=nota, metodo_pago=metodo_pago,
         subtotal=total, propina=prop, total=total + prop,
-        numero=_generar_numero(tenant),
+        numero=_generar_numero(tenant), token=secrets.token_urlsafe(12),
     )
     for it, cantidad, notas in lineas:
         PedidoItem.objects.create(

@@ -11,8 +11,9 @@ from apps.accounts.models import Tenant
 from apps.accounts.permissions import HasTenantAccess
 
 from . import services
-from .selectors import pedido_get, pedido_get_by_numero, pedido_list
+from .selectors import pedido_get, pedido_get_by_token, pedido_list
 from .serializers import PedidoCreateInput, PedidoEstadoInput, PedidoOutput
+from .throttles import OrderCreateThrottle, OrderTrackThrottle
 
 PANEL_PERMS = [IsAuthenticated, HasTenantAccess]
 
@@ -20,6 +21,7 @@ PANEL_PERMS = [IsAuthenticated, HasTenantAccess]
 # ====================== Público (cliente) ======================
 class PublicPedidoCreateApi(APIView):
     permission_classes = [AllowAny]
+    throttle_classes = [OrderCreateThrottle]  # límite por restaurante (no por IP)
 
     def post(self, request: Request, slug: str) -> Response:
         tenant = Tenant.objects.filter(slug=slug, activo=True).first()
@@ -32,14 +34,15 @@ class PublicPedidoCreateApi(APIView):
 
 
 class PublicPedidoDetailApi(APIView):
-    """Seguimiento del pedido por número (sin auth)."""
+    """Seguimiento del pedido por token opaco (sin auth, no adivinable)."""
     permission_classes = [AllowAny]
+    throttle_classes = [OrderTrackThrottle]  # límite por restaurante (no por IP)
 
-    def get(self, request: Request, slug: str, numero: str) -> Response:
+    def get(self, request: Request, slug: str, token: str) -> Response:
         tenant = Tenant.objects.filter(slug=slug, activo=True).first()
         if tenant is None:
             return Response({"detail": "Negocio no encontrado."}, status=404)
-        pedido = pedido_get_by_numero(tenant=tenant, numero=numero)
+        pedido = pedido_get_by_token(tenant=tenant, token=token)
         return Response(PedidoOutput(pedido).data)
 
 

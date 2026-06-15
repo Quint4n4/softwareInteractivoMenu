@@ -121,6 +121,22 @@ REST_FRAMEWORK = {
     ),
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 50,
+    # Rate limiting. Usa el cache 'default' (LocMemCache en dev = por proceso;
+    # en producción usar Redis para que el conteo sea exacto entre workers).
+    "DEFAULT_THROTTLE_CLASSES": (
+        "rest_framework.throttling.AnonRateThrottle",
+        "rest_framework.throttling.UserRateThrottle",
+    ),
+    "DEFAULT_THROTTLE_RATES": {
+        "anon": "240/min",          # clientes sin login (ver menú, etc.)
+        "user": "600/min",          # paneles autenticados (la cocina hace polling)
+        "login": "8/min",           # fuerza bruta de contraseñas
+        "register": "6/hour",       # spam de negocios
+        "create_order": "40/min",   # crear pedido — POR RESTAURANTE (slug): frena inundar la cocina
+        "track_order": "400/min",   # seguir pedido — POR RESTAURANTE; generoso (el token ya evita enumeración)
+        "reset_pw": "6/min",        # reset de contraseña del dueño
+        "stats": "20/min",          # métricas pesadas del super-admin
+    },
 }
 
 SIMPLE_JWT = {

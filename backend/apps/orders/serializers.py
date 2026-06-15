@@ -45,7 +45,7 @@ class PedidoOutput(serializers.ModelSerializer):
     class Meta:
         model = Pedido
         fields = (
-            "id", "numero", "nombre_cliente", "telefono", "tipo", "mesa_texto", "nota",
+            "id", "numero", "token", "nombre_cliente", "telefono", "tipo", "mesa_texto", "nota",
             "metodo_pago", "metodo_pago_label", "estado", "estado_label",
             "subtotal", "propina", "total", "creado", "origen", "lineas",
         )

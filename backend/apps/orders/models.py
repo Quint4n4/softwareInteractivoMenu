@@ -31,6 +31,7 @@ class Pedido(TenantModel):
         TARJETA = "tarjeta", "Tarjeta"
 
     numero = models.CharField(max_length=12, blank=True, default="")
+    token = models.CharField(max_length=24, blank=True, default="", db_index=True, help_text="Token opaco para el seguimiento público del pedido (no adivinable)")
     nombre_cliente = models.CharField(max_length=120, default="")
     telefono = models.CharField(max_length=20, blank=True, default="", help_text="WhatsApp del cliente para enviarle el ticket")
     tipo = models.CharField(max_length=10, choices=Tipo.choices, default=Tipo.MESA)
