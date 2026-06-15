@@ -30,6 +30,31 @@
 .v-tab { flex: 1; appearance: none; background: none; border: 0; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 3px; font-size: 11px; font-weight: 700; color: var(--cocoa-mute); padding: 4px; }
 .v-tab.is-on { color: var(--v-accent); }
 
+/* Botón flotante "Ver mi pedido" */
+.v-fab {
+  position: fixed; left: 50%; transform: translateX(-50%); bottom: 76px; z-index: 30;
+  display: inline-flex; align-items: center; gap: 10px;
+  background: var(--v-accent); color: #fff; border: 0; cursor: pointer;
+  padding: 13px 22px; border-radius: 999px; font-weight: 800; font-size: 16px;
+  box-shadow: 0 16px 34px -10px rgba(31, 36, 48, 0.45);
+  animation: v-fab-pop 0.25s ease both;
+}
+.v-fab:active { transform: translateX(-50%) scale(0.97); }
+.v-fab__count { background: rgba(255, 255, 255, 0.28); border-radius: 999px; min-width: 24px; height: 24px; padding: 0 6px; display: inline-flex; align-items: center; justify-content: center; font-size: 13.5px; }
+.v-fab__total { opacity: 0.95; }
+.v-app--fab { padding-bottom: 150px; }
+@keyframes v-fab-pop { from { opacity: 0; transform: translateX(-50%) translateY(10px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
+
+/* Checkout en 3 pasos */
+.v-steps { display: flex; align-items: center; gap: 8px; padding: 16px 18px 0; }
+.v-step-back { width: 38px; height: 38px; border-radius: 12px; border: 1px solid var(--line); background: #fff; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--cocoa); flex: none; margin-right: 4px; }
+.v-step-dot { width: 27px; height: 27px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 13.5px; font-weight: 800; background: var(--rose-soft); color: var(--cocoa-mute); }
+.v-step-dot.is-on, .v-step-dot.is-done { background: var(--v-accent); color: #fff; }
+.v-step-kick { font-size: 11.5px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--cocoa-mute); font-weight: 800; padding: 14px 18px 0; }
+.v-step-title { font-size: 25px; font-weight: 800; color: var(--cocoa); padding: 2px 18px 6px; line-height: 1.15; letter-spacing: -0.01em; }
+.v-back { display: inline-flex; align-items: center; gap: 6px; background: var(--rose-soft); border: 0; cursor: pointer; color: var(--cocoa); font-weight: 800; font-size: 15.5px; padding: 9px 16px 9px 12px; border-radius: 999px; }
+.v-back:active { transform: scale(0.97); }
+
 /* top header (menu screen) */
 .v-top { display: flex; align-items: center; gap: 12px; padding: 14px 18px 6px; }
 .v-iconbtn { width: 40px; height: 40px; border-radius: 12px; border: 1px solid var(--line); background: #fff; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--cocoa); flex: none; }
@@ -320,6 +345,7 @@
   background: var(--v-accent); color: #fff;
   display: flex; align-items: center; justify-content: center;
 }
+.v-add--label { width: auto; height: 40px; border-radius: 999px; padding: 0 18px 0 14px; gap: 5px; font-weight: 800; font-size: 15px; }
 
 /* item detail bottom sheet */
 .v-sheet-overlay {
@@ -376,8 +402,7 @@
   border: 1px solid var(--line); box-shadow: 0 12px 26px -18px rgba(60, 44, 34, 0.55);
 }
 .v-cat-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.v-cat-name { font-weight: 800; font-size: 16px; color: var(--cocoa); }
-.v-cat-count { font-size: 12.5px; color: var(--cocoa-mute); margin-top: 2px; }
+.v-cat-name { font-weight: 800; font-size: 22px; color: var(--cocoa); letter-spacing: -0.01em; line-height: 1.2; }
 
 /* ===== Menú: tarjetas de producto en cuadrícula (imagen arriba) ===== */
 .v-mgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 13px; margin-bottom: 22px; }
@@ -393,13 +418,13 @@
 .v-mthumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .v-mtag {
   position: absolute; top: 9px; left: 9px; display: inline-flex; align-items: center; gap: 4px;
-  background: rgba(255, 255, 255, 0.95); color: var(--v-accent); font-weight: 800; font-size: 10.5px;
+  background: rgba(255, 255, 255, 0.95); color: var(--v-accent); font-weight: 800; font-size: 12px;
   padding: 5px 10px; border-radius: 999px; box-shadow: 0 5px 14px -6px rgba(60, 44, 34, 0.5);
 }
 .v-mbody { padding: 12px 14px 14px; display: flex; flex-direction: column; gap: 8px; flex: 1; }
-.v-mname { font-weight: 800; font-size: 14.5px; line-height: 1.25; color: var(--cocoa); }
+.v-mname { font-weight: 800; font-size: 17px; line-height: 1.25; color: var(--cocoa); }
 .v-mbot { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: auto; }
-.v-mprice { font-weight: 800; font-size: 15px; color: var(--v-accent); }
+.v-mprice { font-weight: 800; font-size: 18px; color: var(--v-accent); }
 
 /* ===== Ticket + WhatsApp ===== */
 .v-btn--wa { background: #25d366; }

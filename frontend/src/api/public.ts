@@ -72,6 +72,7 @@ export interface PedidoLinea {
 export interface Pedido {
   id: number;
   numero: string;
+  token: string;
   nombre_cliente: string;
   telefono: string;
   tipo: string;
@@ -103,7 +104,7 @@ export async function createPedido(slug: string, payload: PedidoCreate): Promise
   const { data } = await api.post<Pedido>(`/public/${slug}/pedidos/`, payload);
   return data;
 }
-export async function getPedido(slug: string, numero: string): Promise<Pedido> {
-  const { data } = await api.get<Pedido>(`/public/${slug}/pedidos/${numero}/`);
+export async function getPedido(slug: string, token: string): Promise<Pedido> {
+  const { data } = await api.get<Pedido>(`/public/${slug}/pedidos/${token}/`);
   return data;
 }

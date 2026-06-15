@@ -56,11 +56,11 @@ function LangSwitch({ lang, idiomas, onChange, right }: {
   );
 }
 
-function QtyControl({ qty, onAdd, onDec }: { qty: number; onAdd: () => void; onDec: () => void }) {
+function QtyControl({ qty, onAdd, onDec, addLabel }: { qty: number; onAdd: () => void; onDec: () => void; addLabel?: string }) {
   if (qty <= 0) {
     return (
-      <button className="v-add" aria-label="+" onClick={(e) => { e.stopPropagation(); onAdd(); }}>
-        <Icon name="plus" size={20} />
+      <button className={"v-add" + (addLabel ? " v-add--label" : "")} aria-label={addLabel ?? "+"} onClick={(e) => { e.stopPropagation(); onAdd(); }}>
+        <Icon name="plus" size={addLabel ? 17 : 20} />{addLabel ? <span>{addLabel}</span> : null}
       </button>
     );
   }
@@ -92,7 +92,7 @@ function ItemCard({ it, qty, onAdd, onDec, onOpen, ui }: { it: PubItem; qty: num
         <div className="v-mname">{it.nombre}</div>
         <div className="v-mbot">
           <span className="v-mprice">{money(Number(it.precio), cur(it))}</span>
-          <QtyControl qty={qty} onAdd={onAdd} onDec={onDec} />
+          <QtyControl qty={qty} onAdd={onAdd} onDec={onDec} addLabel={ui.addBtn} />
         </div>
       </div>
     </div>
@@ -143,11 +143,11 @@ function DetailSheet({ it, qty, onAdd, onDec, onClose, ui }: { it: PubItem; qty:
 function WelcomeScreen({ nombreNegocio, mesaParam, onStart, ui }: { nombreNegocio: string; mesaParam: string; onStart: (g: Guest) => void; ui: UIStrings }) {
   const [nombre, setNombre] = useState("");
   const [tipo, setTipo] = useState("mesa");
-  const [mesa, setMesa] = useState(mesaParam);
+  const hasMesa = mesaParam.trim().length > 0;
   function submit(e: FormEvent) {
     e.preventDefault();
     if (nombre.trim().length < 2) return;
-    onStart({ nombre: nombre.trim(), tipo, mesa: mesa.trim() });
+    onStart({ nombre: nombre.trim(), tipo, mesa: mesaParam.trim() });
   }
   return (
     <form onSubmit={submit} style={{ padding: "26px 20px" }}>
@@ -156,27 +156,28 @@ function WelcomeScreen({ nombreNegocio, mesaParam, onStart, ui }: { nombreNegoci
       <div className="v-title" style={{ fontSize: 26 }}>{ui.welcomeTo} {nombreNegocio}</div>
       <p className="v-cta-note" style={{ textAlign: "left", margin: "8px 0 18px" }}>{ui.welcomeNote}</p>
 
-      <label className="v-field-label">{ui.howVisit}</label>
-      <div className="v-typecards" style={{ marginBottom: 16 }}>
-        <button type="button" className={"v-typecard" + (tipo === "mesa" ? " is-on" : "")} onClick={() => setTipo("mesa")}>
-          <span className="ico"><Icon name="pin" size={20} /></span>
-          <span><span className="t">{ui.dineIn}</span><div className="s">{ui.atTable}</div></span>
-        </button>
-        <button type="button" className={"v-typecard" + (tipo === "llevar" ? " is-on" : "")} onClick={() => setTipo("llevar")}>
-          <span className="ico"><Icon name="box" size={20} /></span>
-          <span><span className="t">{ui.takeout}</span><div className="s">{ui.pickupBar}</div></span>
-        </button>
-      </div>
+      {hasMesa ? (
+        <div style={{ marginBottom: 18 }}>
+          <span className="v-mesa"><Icon name="pin" size={14} /> {ui.table} {mesaParam}</span>
+        </div>
+      ) : (
+        <>
+          <label className="v-field-label">{ui.howVisit}</label>
+          <div className="v-typecards" style={{ marginBottom: 16 }}>
+            <button type="button" className={"v-typecard" + (tipo === "mesa" ? " is-on" : "")} onClick={() => setTipo("mesa")}>
+              <span className="ico"><Icon name="pin" size={20} /></span>
+              <span><span className="t">{ui.dineIn}</span><div className="s">{ui.atTable}</div></span>
+            </button>
+            <button type="button" className={"v-typecard" + (tipo === "llevar" ? " is-on" : "")} onClick={() => setTipo("llevar")}>
+              <span className="ico"><Icon name="box" size={20} /></span>
+              <span><span className="t">{ui.takeout}</span><div className="s">{ui.pickupBar}</div></span>
+            </button>
+          </div>
+        </>
+      )}
 
       <label className="v-field-label">{ui.yourName}</label>
       <input className="v-input" value={nombre} onChange={(e) => setNombre(e.target.value)} placeholder={ui.yourNamePh} style={{ marginBottom: 14 }} autoFocus />
-
-      {tipo === "mesa" && (
-        <>
-          <label className="v-field-label">{ui.tableNumber}</label>
-          <input className="v-input" value={mesa} onChange={(e) => setMesa(e.target.value)} placeholder={ui.tablePh} style={{ marginBottom: 14 }} />
-        </>
-      )}
 
       <button className="v-btn" type="submit" disabled={nombre.trim().length < 2} style={{ marginTop: 8 }}>
         {ui.seeMenu} <Icon name="chevron" size={17} />
@@ -226,7 +227,6 @@ function HomeScreen({ data, cats, goMenu, ui, lang, idiomas, onLang, vista, hasT
               </div>
               <div>
                 <div className="v-cat-name">{c.nombre}</div>
-                <div className="v-cat-count">{c.items.length} {ui.options}</div>
               </div>
             </button>
           );
@@ -248,8 +248,10 @@ function MenuScreen({ cats, active, qtyOf, onAdd, onDec, onOpen, goHome, ui, lan
   if (!cat) return <div className="v-placeholder" style={{ minHeight: 200 }}>{ui.emptyMenu}</div>;
   return (
     <div>
-      <div className="v-top">
-        <button className="v-iconbtn" onClick={goHome} aria-label="Inicio"><Icon name="back" size={19} /></button>
+      <div style={{ padding: "14px 18px 0" }}>
+        <button className="v-back" onClick={goHome}><Icon name="back" size={18} /> {ui.back}</button>
+      </div>
+      <div className="v-top" style={{ paddingTop: 4 }}>
         <span className="v-title">{cat.nombre}</span>
         <LangSwitch lang={lang} idiomas={idiomas} onChange={onLang} right />
       </div>
@@ -277,6 +279,7 @@ function CheckoutScreen({ lines, subtotal, guest, busy, onAdd, onDec, onRemove, 
   const [telefono, setTelefono] = useState("");
   const [tipPct, setTipPct] = useState(10);
   const [metodo, setMetodo] = useState("tarjeta");
+  const [paso, setPaso] = useState(1);
   const propina = Math.round(subtotal * tipPct) / 100;
   const total = subtotal + propina;
 
@@ -293,80 +296,99 @@ function CheckoutScreen({ lines, subtotal, guest, busy, onAdd, onDec, onRemove, 
 
   return (
     <div>
-      <div className="v-top"><span className="v-title">{ui.yourCart}</span></div>
+      {paso > 1 && (
+        <div style={{ padding: "14px 18px 0" }}>
+          <button className="v-back" onClick={() => setPaso(paso - 1)}><Icon name="back" size={18} /> {ui.back}</button>
+        </div>
+      )}
+      <div className="v-steps">
+        {[1, 2, 3].map((n) => (
+          <span key={n} className={"v-step-dot" + (n < paso ? " is-done" : n === paso ? " is-on" : "")}>
+            {n < paso ? <Icon name="check" size={14} stroke={3} /> : n}
+          </span>
+        ))}
+      </div>
+      <div className="v-step-kick">{ui.step} {paso} / 3</div>
+      <div className="v-step-title">{paso === 1 ? ui.stepReview : paso === 2 ? ui.stepPay : ui.stepConfirm}</div>
+
       <div className="v-co">
-        <span className="v-mesa" style={{ marginBottom: 14 }}>
-          <Icon name="pin" size={14} /> {guest.tipo === "mesa" ? `${ui.table} ${guest.mesa || "—"}` : ui.takeout} · {guest.nombre}
-        </span>
-
-        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-          {lines.map(({ it, qty }) => (
-            <div key={it.id} className="v-co-item">
-              <div className="v-co-thumb">{it.imagen ? <img src={mediaUrl(it.imagen) ?? ""} alt={it.nombre} /> : <Icon name={it.es_paquete ? "box" : "image"} size={20} />}</div>
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ display: "flex", justifyContent: "space-between", gap: 8 }}>
-                  <div>
-                    <div className="v-co-name">{it.nombre}</div>
-                    <div className="v-co-unit">{money(Number(it.precio), cur(it))} {ui.each}</div>
+        {paso === 1 && (
+          <>
+            <span className="v-mesa" style={{ marginBottom: 14 }}>
+              <Icon name="pin" size={14} /> {guest.tipo === "mesa" ? `${ui.table} ${guest.mesa || "—"}` : ui.takeout} · {guest.nombre}
+            </span>
+            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+              {lines.map(({ it, qty }) => (
+                <div key={it.id} className="v-co-item">
+                  <div className="v-co-thumb">{it.imagen ? <img src={mediaUrl(it.imagen) ?? ""} alt={it.nombre} /> : <Icon name={it.es_paquete ? "box" : "image"} size={20} />}</div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", gap: 8 }}>
+                      <div>
+                        <div className="v-co-name">{it.nombre}</div>
+                        <div className="v-co-unit">{money(Number(it.precio), cur(it))} {ui.each}</div>
+                      </div>
+                      <button className="v-trash" aria-label="x" onClick={() => onRemove(it.id)}><Icon name="trash" size={18} /></button>
+                    </div>
+                    <div className="v-co-bottom">
+                      <QtyControl qty={qty} onAdd={() => onAdd(it.id)} onDec={() => onDec(it.id)} />
+                      <span className="v-co-line">{money(Number(it.precio) * qty, cur(it))}</span>
+                    </div>
                   </div>
-                  <button className="v-trash" aria-label="x" onClick={() => onRemove(it.id)}><Icon name="trash" size={18} /></button>
                 </div>
-                <div className="v-co-bottom">
-                  <QtyControl qty={qty} onAdd={() => onAdd(it.id)} onDec={() => onDec(it.id)} />
-                  <span className="v-co-line">{money(Number(it.precio) * qty, cur(it))}</span>
-                </div>
-              </div>
+              ))}
             </div>
-          ))}
-        </div>
+            <div className="v-section-label">{ui.kitchenNotes}</div>
+            <textarea className="v-textarea" value={nota} onChange={(e) => setNota(e.target.value)} placeholder={ui.notesPh} />
+            <div className="v-section-label">{ui.whatsappPhone}</div>
+            <input className="v-input" value={telefono} onChange={(e) => setTelefono(e.target.value)} placeholder={ui.whatsappPhonePh} inputMode="tel" />
+            <div className="v-co-note" style={{ textAlign: "left", margin: "6px 0 0" }}>{ui.phoneOptional}</div>
+          </>
+        )}
 
-        <div className="v-section-label">{ui.kitchenNotes}</div>
-        <textarea className="v-textarea" value={nota} onChange={(e) => setNota(e.target.value)} placeholder={ui.notesPh} />
-
-        <div className="v-section-label">{ui.whatsappPhone}</div>
-        <input className="v-input" value={telefono} onChange={(e) => setTelefono(e.target.value)} placeholder={ui.whatsappPhonePh} inputMode="tel" />
-        <div className="v-co-note" style={{ textAlign: "left", margin: "6px 0 0" }}>{ui.phoneOptional}</div>
-
-        <div className="v-section-label">{ui.tip}</div>
-        <div className="v-seg">
-          {TIPS.map((t) => (
-            <button key={t.pct} className={tipPct === t.pct ? "is-on" : ""} onClick={() => setTipPct(t.pct)}>{t.pct === 0 ? ui.noTip : `${t.pct}%`}</button>
-          ))}
-        </div>
-
-        <div className="v-section-label">{ui.payment}</div>
-        <div className="v-pay">
-          <button className={"v-pay-card" + (metodo === "tarjeta" ? " is-on" : "")} onClick={() => setMetodo("tarjeta")}>
-            <span className="v-pay-ico"><Icon name="card" size={20} /></span>
-            <span><span className="v-pay-t">{ui.payNow}</span><div className="v-pay-s">{ui.payNowSub}</div></span>
-            <span className="v-radio">{metodo === "tarjeta" && <Icon name="check" size={13} stroke={3} />}</span>
-          </button>
-          <button className={"v-pay-card" + (metodo === "efectivo" ? " is-on" : "")} onClick={() => setMetodo("efectivo")}>
-            <span className="v-pay-ico"><Icon name="cash" size={20} /></span>
-            <span><span className="v-pay-t">{ui.payCash}</span><div className="v-pay-s">{ui.payCashSub}</div></span>
-            <span className="v-radio">{metodo === "efectivo" && <Icon name="check" size={13} stroke={3} />}</span>
-          </button>
-          {metodo === "tarjeta" && (
-            <div className="v-card-onfile">
-              <span className="v-card-chip" />
-              <span style={{ fontWeight: 700, letterSpacing: 2, color: "var(--cocoa-soft)" }}>•••• 4827</span>
-              <span style={{ marginLeft: "auto", color: "var(--v-accent)", fontWeight: 800, fontSize: 13 }}>{ui.change}</span>
+        {paso === 2 && (
+          <>
+            <div className="v-section-label">{ui.tip}</div>
+            <div className="v-seg">
+              {TIPS.map((t) => (
+                <button key={t.pct} className={tipPct === t.pct ? "is-on" : ""} onClick={() => setTipPct(t.pct)}>{t.pct === 0 ? ui.noTip : `${t.pct}%`}</button>
+              ))}
             </div>
-          )}
-        </div>
+            <div className="v-section-label">{ui.payment}</div>
+            <div className="v-pay">
+              <button className={"v-pay-card" + (metodo === "tarjeta" ? " is-on" : "")} onClick={() => setMetodo("tarjeta")}>
+                <span className="v-pay-ico"><Icon name="card" size={20} /></span>
+                <span><span className="v-pay-t">{ui.payNow}</span><div className="v-pay-s">{ui.payNowSub}</div></span>
+                <span className="v-radio">{metodo === "tarjeta" && <Icon name="check" size={13} stroke={3} />}</span>
+              </button>
+              <button className={"v-pay-card" + (metodo === "efectivo" ? " is-on" : "")} onClick={() => setMetodo("efectivo")}>
+                <span className="v-pay-ico"><Icon name="cash" size={20} /></span>
+                <span><span className="v-pay-t">{ui.payCash}</span><div className="v-pay-s">{ui.payCashSub}</div></span>
+                <span className="v-radio">{metodo === "efectivo" && <Icon name="check" size={13} stroke={3} />}</span>
+              </button>
+            </div>
+          </>
+        )}
 
-        <div className="v-co-summary">
-          <div className="v-co-srow"><span>{ui.subtotal}</span><span>{money(subtotal)}</span></div>
-          <div className="v-co-srow"><span>{ui.tip} ({tipPct}%)</span><span>{money(propina)}</span></div>
-          <div className="v-co-srow"><span>{ui.tableService}</span><span>{ui.included}</span></div>
-          <div className="v-co-stotal"><span>{ui.total}</span><b>{money(total)}</b></div>
-        </div>
+        {paso === 3 && (
+          <>
+            <div className="v-co-summary" style={{ marginTop: 18 }}>
+              <div className="v-co-srow"><span>{ui.subtotal}</span><span>{money(subtotal)}</span></div>
+              <div className="v-co-srow"><span>{ui.tip} ({tipPct}%)</span><span>{money(propina)}</span></div>
+              <div className="v-co-srow"><span>{ui.tableService}</span><span>{ui.included}</span></div>
+              <div className="v-co-stotal"><span>{ui.total}</span><b>{money(total)}</b></div>
+            </div>
+          </>
+        )}
 
         <div className="v-co-pay">
-          <button className="v-btn" disabled={busy} onClick={() => onConfirm({ nota, propina, metodo, telefono })}>
-            {busy ? ui.sending : (metodo === "tarjeta" ? `${ui.payConfirm} · ${money(total)}` : `${ui.confirmOrder} · ${money(total)}`)}
-          </button>
-          <p className="v-co-note">{metodo === "tarjeta" ? ui.payCardNote : ui.payCashNote}</p>
+          {paso < 3 ? (
+            <button className="v-btn" onClick={() => setPaso(paso + 1)}>{ui.continueBtn} <Icon name="chevron" size={16} /></button>
+          ) : (
+            <button className="v-btn" disabled={busy} onClick={() => onConfirm({ nota, propina, metodo, telefono })}>
+              {busy ? ui.sending : `${ui.confirmOrder} · ${money(total)}`}
+            </button>
+          )}
+          {paso === 3 && <p className="v-co-note">{metodo === "tarjeta" ? ui.payCardNote : ui.payCashNote}</p>}
         </div>
       </div>
     </div>
@@ -490,7 +512,7 @@ function TabBar({ screen, go, cartCount, ui }: { screen: Screen; go: (s: Screen)
       {tabs.map((t) => (
         <button key={t.id} className={"v-tab" + (activeTab === t.id ? " is-on" : "")} onClick={() => go(t.id)}>
           <span style={{ position: "relative" }}>
-            <Icon name={t.icon} size={22} stroke={activeTab === t.id ? 2.2 : 1.9} />
+            <Icon name={t.icon} size={26} stroke={activeTab === t.id ? 2.2 : 1.9} />
             {t.id === "cart" && cartCount > 0 && <span className="v-tab__badge">{cartCount}</span>}
           </span>
           {t.label}
@@ -527,7 +549,7 @@ function ProductCard({ it, qty, onAdd, onDec, onOpen, ui }: { it: PubItem; qty: 
         {it.descripcion && <div className="v-prod__desc">{it.descripcion}</div>}
         <div className="v-prod__bot">
           <span className="v-price">{money(Number(it.precio), cur(it))}</span>
-          <QtyControl qty={qty} onAdd={onAdd} onDec={onDec} />
+          <QtyControl qty={qty} onAdd={onAdd} onDec={onDec} addLabel={ui.addBtn} />
         </div>
       </div>
     </div>
@@ -564,8 +586,8 @@ export default function Vitrina() {
     } else {
       setScreen("welcome");
     }
-    const num = localStorage.getItem(`vd_order_${slug}`);
-    if (num) getPedido(slug, num).then(setOrder).catch(() => localStorage.removeItem(`vd_order_${slug}`));
+    const token = localStorage.getItem(`vd_order_${slug}`);
+    if (token) getPedido(slug, token).then(setOrder).catch(() => localStorage.removeItem(`vd_order_${slug}`));
   }, [slug]);
 
   // Guarda el carrito en el navegador para que NO se pierda al recargar la página.
@@ -628,7 +650,7 @@ export default function Vitrina() {
 
   useEffect(() => {
     if (!order || order.estado === "entregado" || order.estado === "cancelado") return;
-    const t = setInterval(() => { getPedido(slug, order.numero).then(setOrder).catch(() => undefined); }, 5000);
+    const t = setInterval(() => { getPedido(slug, order.token).then(setOrder).catch(() => undefined); }, 5000);
     return () => clearInterval(t);
   }, [order, slug]);
 
@@ -678,7 +700,7 @@ export default function Vitrina() {
         nombre_cliente: guest.nombre, telefono: f.telefono, tipo: guest.tipo, mesa_texto: guest.mesa,
         nota: f.nota, metodo_pago: f.metodo, propina: f.propina, items,
       });
-      localStorage.setItem(`vd_order_${slug}`, ped.numero);
+      localStorage.setItem(`vd_order_${slug}`, ped.token);
       setOrder(ped);
       setCart({});
       setScreen("pedido");
@@ -735,7 +757,7 @@ export default function Vitrina() {
 
   return (
     <div className="vitrina" style={rootStyle}>
-      <div className="v-app">
+      <div className={"v-app" + (cartCount > 0 && screen !== "cart" ? " v-app--fab" : "")}>
         {screen === "home" && <HomeScreen data={data} cats={cats} goMenu={goMenu} ui={ui} lang={activeLang} idiomas={idiomas} onLang={chooseLang} vista={vista} hasTabs={hasMenu && hasTienda} onVista={setVista} />}
         {screen === "menu" && (
           <MenuScreen
@@ -765,6 +787,13 @@ export default function Vitrina() {
           )
         )}
 
+        {cartCount > 0 && screen !== "cart" && (
+          <button className="v-fab" onClick={() => setScreen("cart")}>
+            <span className="v-fab__count">{cartCount}</span>
+            <span>{ui.viewOrder}</span>
+            <span className="v-fab__total">{money(subtotal)}</span>
+          </button>
+        )}
         <PoweredBy />
         <TabBar screen={screen} go={setScreen} cartCount={cartCount} ui={ui} />
       </div>

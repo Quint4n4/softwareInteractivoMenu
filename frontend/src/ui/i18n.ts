@@ -63,6 +63,14 @@ export interface UIStrings {
   bundle: string;
   includes: string;
   addToCart: string;
+  addBtn: string;
+  viewOrder: string;
+  stepReview: string;
+  stepPay: string;
+  stepConfirm: string;
+  continueBtn: string;
+  back: string;
+  step: string;
   addAnother: string;
   hi: string;
   welcomeNote: string;
@@ -145,6 +153,14 @@ const ES: UIStrings = {
   bundle: "Paquete",
   includes: "Incluye",
   addToCart: "Agregar a la orden",
+  addBtn: "Pedir",
+  viewOrder: "Ver mi orden",
+  stepReview: "Revisa tu orden",
+  stepPay: "¿Cómo quieres pagar?",
+  stepConfirm: "Confirma y listo",
+  continueBtn: "Continuar",
+  back: "Volver",
+  step: "Paso",
   addAnother: "Agregar otro",
   hi: "¡Hola!",
   welcomeNote: "Un par de datos para preparar tu experiencia.",
@@ -167,8 +183,8 @@ const ES: UIStrings = {
   tip: "Propina",
   noTip: "Sin propina",
   payment: "Forma de pago",
-  payNow: "Pagar ahora",
-  payNowSub: "Tarjeta o pago con QR · sin filas",
+  payNow: "Pagar con tarjeta",
+  payNowSub: "Con la terminal en tu mesa",
   payCash: "Pagar en efectivo",
   payCashSub: "Le pagas al mesero en tu mesa",
   change: "Cambiar",
@@ -179,7 +195,7 @@ const ES: UIStrings = {
   sending: "Enviando…",
   payConfirm: "Pagar y confirmar",
   confirmOrder: "Confirmar pedido",
-  payCardNote: "Se cobrará a tu tarjeta al confirmar.",
+  payCardNote: "Pagas con la terminal en tu mesa.",
   payCashNote: "Pagas al recibir tu pedido.",
   tracking: "Seguimiento",
   eta: "Tiempo estimado",
@@ -232,6 +248,14 @@ const EN: UIStrings = {
   bundle: "Bundle",
   includes: "Includes",
   addToCart: "Add to order",
+  addBtn: "Order",
+  viewOrder: "View my order",
+  stepReview: "Review your order",
+  stepPay: "How do you want to pay?",
+  stepConfirm: "Confirm & done",
+  continueBtn: "Continue",
+  back: "Back",
+  step: "Step",
   addAnother: "Add another",
   hi: "Hi there!",
   welcomeNote: "A couple of details to set up your experience.",
@@ -254,8 +278,8 @@ const EN: UIStrings = {
   tip: "Tip",
   noTip: "No tip",
   payment: "Payment method",
-  payNow: "Pay now",
-  payNowSub: "Card or QR pay · no lines",
+  payNow: "Pay with card",
+  payNowSub: "With the terminal at your table",
   payCash: "Pay with cash",
   payCashSub: "Pay the server at your table",
   change: "Change",
@@ -266,7 +290,7 @@ const EN: UIStrings = {
   sending: "Sending…",
   payConfirm: "Pay & confirm",
   confirmOrder: "Confirm order",
-  payCardNote: "Your card will be charged on confirmation.",
+  payCardNote: "Pay with the terminal at your table.",
   payCashNote: "You pay when you get your order.",
   tracking: "Tracking",
   eta: "Estimated time",
