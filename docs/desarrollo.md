@@ -50,7 +50,31 @@ docker compose exec backend python manage.py seed_fotos
 docker compose exec backend python manage.py seed_i18n --slug prueba
 # 5) Crear el catálogo de módulos (Menú, Catálogo, etc.)
 docker compose exec backend python manage.py seed_modulos
+# 6) Crear los planes de ejemplo (Prueba / Básico / Pro / Premium)
+docker compose exec backend python manage.py seed_planes
 ```
+
+## Copia exacta de los datos (dump + imágenes) — para compartir
+
+Si quieres que otra persona vea **exactamente** tus datos (no solo el demo seed):
+
+**Generar la copia** (en la máquina que tiene los datos):
+```bash
+docker compose exec backend python manage.py dumpdata --natural-foreign --natural-primary \
+  --indent 2 -e contenttypes -e auth.permission -e admin.logentry -e sessions.session \
+  -o demo_data.json
+```
+Crea `backend/demo_data.json`. Las imágenes viven en `backend/media/` (no están en git).
+Comprime ambos para enviarlos: `demo_data.json` + la carpeta `media/`.
+
+**Cargar la copia** (en la otra máquina, ya con el repo clonado y `docker compose up`):
+```bash
+# 1) copia la carpeta media/ del zip dentro de backend/
+# 2) copia demo_data.json dentro de backend/
+docker compose exec backend python manage.py migrate
+docker compose exec backend python manage.py loaddata demo_data.json
+```
+Los usuarios vienen en el dump (con sus contraseñas), así que se entra con las mismas credenciales.
 
 ## Pruebas (pytest)
 

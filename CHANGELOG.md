@@ -8,6 +8,20 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es/1.0.0/).
 
 ---
 
+## [0.7.0] — 2026-06-22
+
+### Añadido — Capacidad operativa (configurable por el dueño)
+- **Tiempo de preparación por platillo**: el dueño lo define en cada platillo; el **ETA del pedido** que ve el cliente ahora se **calcula** según lo que pidió (antes era fijo "18–22 min").
+- **Límite diario por platillo**: el dueño pone un máximo por día. Al llegar al tope, el platillo se muestra **"Agotado hoy"** en el menú (no se puede pedir) y el checkout lo **rechaza** con un mensaje claro. Se reinicia solo cada día (se cuenta por fecha, sin cron).
+
+### Técnico
+- Campos `tiempo_preparacion` y `limite_diario` en `catalog.Item`; `eta_min` en `orders.Pedido`. Migraciones `catalog/0003` y `orders/0006`.
+- `agotado_hoy` calculado en el menú público con una sola query agregada (sin N+1).
+- `conftest.py`: limpia el cache de throttling entre tests (evita 429 falsos por acumulación); seguimiento de pedido ahora se testea por token.
+- Guía para correr en otra máquina con copia exacta de datos (dump + `media/`) en [docs/desarrollo.md](docs/desarrollo.md).
+
+---
+
 ## [0.6.0] — 2026-06-15
 
 ### Mejorado — UX del menú del cliente (pruebas con usuarios reales)
