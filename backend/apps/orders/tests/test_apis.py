@@ -37,12 +37,12 @@ def test_flujo_pedido_completo():
         format="json",
     )
     assert r.status_code == 201, r.data
-    numero = r.data["numero"]
+    token = r.data["token"]
     assert float(r.data["total"]) == 60.0
     assert r.data["estado"] == "nuevo"
 
-    # seguimiento público
-    t = pub.get(f"/api/public/{slug}/pedidos/{numero}/")
+    # seguimiento público (por token opaco, no por número)
+    t = pub.get(f"/api/public/{slug}/pedidos/{token}/")
     assert t.status_code == 200 and t.data["estado"] == "nuevo"
 
     # panel: listar y avanzar estado
