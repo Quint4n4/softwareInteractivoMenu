@@ -131,6 +131,8 @@ function ItemSheet({
   const [incluye, setIncluye] = useState<string[]>(it?.incluye ?? []);
   const [sku, setSku] = useState(it?.sku ?? "");
   const [stock, setStock] = useState<string>(it?.stock != null ? String(it.stock) : "");
+  const [tiempoPrep, setTiempoPrep] = useState<string>(it?.tiempo_preparacion != null ? String(it.tiempo_preparacion) : "");
+  const [limiteDiario, setLimiteDiario] = useState<string>(it?.limite_diario != null ? String(it.limite_diario) : "");
   const [vars, setVars] = useState<VarDraft[]>(
     it?.variantes.map((v) => ({ id: v.id, nombre: v.nombre, precio_extra: v.precio_extra })) ?? [],
   );
@@ -155,6 +157,8 @@ function ItemSheet({
         es_paquete: paquete,
         incluye: paquete ? incluye.map((s) => s.trim()).filter(Boolean) : [],
         etiqueta: destacado ? "Favorito" : "",
+        tiempo_preparacion: tiempoPrep.trim() === "" ? null : Number(tiempoPrep),
+        limite_diario: limiteDiario.trim() === "" ? null : Number(limiteDiario),
       };
       if (kind === "catalogo") {
         payload.sku = sku.trim();
@@ -257,6 +261,17 @@ function ItemSheet({
           <div>
             <label className="flabel">Descripción</label>
             <textarea className="field" rows={2} value={descripcion} onChange={(e) => setDescripcion(e.target.value)} placeholder="Ingredientes, notas…" />
+          </div>
+
+          <div className="row" style={{ gap: 12, alignItems: "flex-end" }}>
+            <div className="grow">
+              <label className="flabel">Tiempo de preparación (min)</label>
+              <input className="field" type="number" min="0" value={tiempoPrep} onChange={(e) => setTiempoPrep(e.target.value)} placeholder="Ej. 15" />
+            </div>
+            <div className="grow">
+              <label className="flabel">Límite por día</label>
+              <input className="field" type="number" min="0" value={limiteDiario} onChange={(e) => setLimiteDiario(e.target.value)} placeholder="Sin límite" />
+            </div>
           </div>
 
           {kind === "catalogo" && (

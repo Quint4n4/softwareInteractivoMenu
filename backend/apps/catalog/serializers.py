@@ -3,6 +3,8 @@
 Los serializers NO contienen lógica de negocio ni create()/update(); solo validan
 la entrada y dan forma a la salida. La lógica vive en services.py / selectors.py.
 """
+from typing import Any
+
 from rest_framework import serializers
 
 from .models import Categoria, Coleccion, Item, Variante
@@ -68,6 +70,8 @@ class ItemInput(serializers.Serializer):
     stock = serializers.IntegerField(required=False, allow_null=True)
     orden = serializers.IntegerField(min_value=0, default=0)
     i18n = serializers.JSONField(required=False)
+    tiempo_preparacion = serializers.IntegerField(required=False, allow_null=True, min_value=0)
+    limite_diario = serializers.IntegerField(required=False, allow_null=True, min_value=0)
 
 
 class ItemUpdateInput(serializers.Serializer):
@@ -83,6 +87,8 @@ class ItemUpdateInput(serializers.Serializer):
     stock = serializers.IntegerField(required=False, allow_null=True)
     orden = serializers.IntegerField(min_value=0, required=False)
     i18n = serializers.JSONField(required=False)
+    tiempo_preparacion = serializers.IntegerField(required=False, allow_null=True, min_value=0)
+    limite_diario = serializers.IntegerField(required=False, allow_null=True, min_value=0)
 
 
 class ItemDisponibilidadInput(serializers.Serializer):
@@ -101,7 +107,9 @@ class ItemOutput(serializers.ModelSerializer):
         fields = (
             "id", "categoria_id", "nombre", "descripcion", "precio", "moneda",
             "imagen", "disponible", "destacado", "etiqueta", "es_paquete",
-            "incluye", "orden", "sku", "stock", "i18n", "variantes",
+            "incluye", "orden", "sku", "stock", "i18n",
+            "tiempo_preparacion", "limite_diario",
+            "variantes",
         )
 
 
@@ -119,15 +127,30 @@ class VarianteUpdateInput(serializers.Serializer):
 
 # ===================== Vitrina pública (output) ====================
 class PublicItemOutput(serializers.ModelSerializer):
+    """Serializer público de un item del menú/catálogo.
+
+    Incluye:
+    - ``tiempo_preparacion``: minutos de preparación (null si no está configurado).
+    - ``agotado_hoy``: True si el item ya alcanzó su límite diario de ventas.
+      El valor es inyectado desde el context['agotados_hoy'] (dict de item_id → bool)
+      calculado con UNA query agregada por el selector; si no viene en el contexto
+      el campo devuelve False (degradación sin error).
+    """
+
     variantes = VarianteOutput(many=True, read_only=True)
+    agotado_hoy = serializers.SerializerMethodField()
 
     class Meta:
         model = Item
         fields = (
             "id", "nombre", "descripcion", "precio", "moneda", "imagen",
             "destacado", "etiqueta", "es_paquete", "incluye", "sku",
-            "i18n", "variantes",
+            "i18n", "tiempo_preparacion", "agotado_hoy", "variantes",
         )
+
+    def get_agotado_hoy(self, obj: Item) -> bool:
+        agotados: dict[int, bool] = self.context.get("agotados_hoy", {})
+        return agotados.get(obj.pk, False)
 
 
 class PublicCategoriaOutput(serializers.ModelSerializer):
@@ -137,10 +160,10 @@ class PublicCategoriaOutput(serializers.ModelSerializer):
         model = Categoria
         fields = ("id", "nombre", "orden", "i18n", "items")
 
-    def get_items(self, obj):
+    def get_items(self, obj: Categoria) -> Any:
         qs = [i for i in obj.items.all() if i.disponible]
         qs.sort(key=lambda i: i.orden)
-        return PublicItemOutput(qs, many=True).data
+        return PublicItemOutput(qs, many=True, context=self.context).data
 
 
 class PublicColeccionOutput(serializers.ModelSerializer):
@@ -150,7 +173,7 @@ class PublicColeccionOutput(serializers.ModelSerializer):
         model = Coleccion
         fields = ("id", "tipo", "nombre", "orden", "categorias")
 
-    def get_categorias(self, obj):
+    def get_categorias(self, obj: Coleccion) -> Any:
         qs = [c for c in obj.categorias.all() if c.activo]
         qs.sort(key=lambda c: c.orden)
-        return PublicCategoriaOutput(qs, many=True).data
+        return PublicCategoriaOutput(qs, many=True, context=self.context).data

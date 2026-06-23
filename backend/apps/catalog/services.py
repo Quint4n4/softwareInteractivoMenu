@@ -89,7 +89,15 @@ def item_create(
     es_paquete: bool = False, incluye: list[str] | None = None,
     sku: str = "", stock: int | None = None, orden: int = 0,
     i18n: dict[str, Any] | None = None,
+    tiempo_preparacion: int | None = None,
+    limite_diario: int | None = None,
 ) -> Item:
+    """Crea un platillo/producto en el catálogo del negocio.
+
+    Args:
+        tiempo_preparacion: Minutos estimados de preparación (None = no configurado).
+        limite_diario: Máximo de unidades vendibles por día (None = sin límite).
+    """
     categoria = categoria_get(tenant=tenant, categoria_id=categoria_id)
     if categoria.tenant_id != tenant.id:  # defensa en profundidad
         raise ValidationError("La categoría no pertenece a este negocio.")
@@ -98,6 +106,8 @@ def item_create(
         descripcion=descripcion, moneda=moneda, etiqueta=etiqueta,
         es_paquete=es_paquete, incluye=incluye or [], sku=sku, stock=stock,
         orden=orden, i18n=i18n or {},
+        tiempo_preparacion=tiempo_preparacion,
+        limite_diario=limite_diario,
     )
     item.full_clean(exclude=["tenant"])
     item.save()

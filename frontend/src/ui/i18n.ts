@@ -64,6 +64,7 @@ export interface UIStrings {
   includes: string;
   addToCart: string;
   addBtn: string;
+  soldOut: string;
   viewOrder: string;
   stepReview: string;
   stepPay: string;
@@ -154,6 +155,7 @@ const ES: UIStrings = {
   includes: "Incluye",
   addToCart: "Agregar a la orden",
   addBtn: "Pedir",
+  soldOut: "Agotado hoy",
   viewOrder: "Ver mi orden",
   stepReview: "Revisa tu orden",
   stepPay: "¿Cómo quieres pagar?",
@@ -249,6 +251,7 @@ const EN: UIStrings = {
   includes: "Includes",
   addToCart: "Add to order",
   addBtn: "Order",
+  soldOut: "Sold out",
   viewOrder: "View my order",
   stepReview: "Review your order",
   stepPay: "How do you want to pay?",

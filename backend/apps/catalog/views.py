@@ -21,6 +21,7 @@ from .selectors import (
     coleccion_list,
     item_get,
     item_list,
+    items_agotados_hoy,
     public_colecciones_for,
     public_tenant,
     variante_get,
@@ -250,12 +251,16 @@ class PublicMenuApi(APIView):
             )
 
         colecciones = public_colecciones_for(tenant=tenant)
+        # Una sola query agregada para calcular los agotados del día; sin N+1.
+        agotados = items_agotados_hoy(tenant=tenant)
         return Response(
             {
                 "negocio": negocio,
                 "disponible": True,
                 "modulos": tenant_active_modulos(tenant=tenant),
                 "tema": tema_data,
-                "colecciones": PublicColeccionOutput(colecciones, many=True).data,
+                "colecciones": PublicColeccionOutput(
+                    colecciones, many=True, context={"agotados_hoy": agotados}
+                ).data,
             }
         )

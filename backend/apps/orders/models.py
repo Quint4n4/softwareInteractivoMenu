@@ -43,6 +43,10 @@ class Pedido(TenantModel):
     subtotal = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     propina = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     total = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    eta_min = models.PositiveIntegerField(
+        default=0,
+        help_text="Tiempo estimado de preparación en minutos (calculado al crear el pedido)",
+    )
 
     class Meta:
         ordering = ["-creado"]

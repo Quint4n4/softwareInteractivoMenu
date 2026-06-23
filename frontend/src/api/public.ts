@@ -20,6 +20,8 @@ export interface PubItem {
   es_paquete: boolean;
   incluye: string[];
   sku: string;
+  tiempo_preparacion: number | null;
+  agotado_hoy: boolean;
   i18n: I18n;
   variantes: PubVariante[];
 }
@@ -85,6 +87,7 @@ export interface Pedido {
   subtotal: string;
   propina: string;
   total: string;
+  eta_min: number;
   creado: string;
   origen: string;
   lineas: PedidoLinea[];

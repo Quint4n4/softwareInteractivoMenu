@@ -40,6 +40,8 @@ export interface Item {
   orden: number;
   sku: string;
   stock: number | null;
+  tiempo_preparacion: number | null;
+  limite_diario: number | null;
   i18n: Record<string, unknown>;
   variantes: Variante[];
 }
@@ -99,6 +101,8 @@ export interface ItemInput {
   orden?: number;
   sku?: string;
   stock?: number | null;
+  tiempo_preparacion?: number | null;
+  limite_diario?: number | null;
   i18n?: Record<string, unknown>;
 }
 

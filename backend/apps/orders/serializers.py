@@ -47,7 +47,7 @@ class PedidoOutput(serializers.ModelSerializer):
         fields = (
             "id", "numero", "token", "nombre_cliente", "telefono", "tipo", "mesa_texto", "nota",
             "metodo_pago", "metodo_pago_label", "estado", "estado_label",
-            "subtotal", "propina", "total", "creado", "origen", "lineas",
+            "subtotal", "propina", "total", "eta_min", "creado", "origen", "lineas",
         )
 
     def get_origen(self, obj: Pedido) -> str:

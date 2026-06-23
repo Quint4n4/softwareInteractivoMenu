@@ -1,7 +1,8 @@
 """Lecturas del catálogo. Toda lectura por id pasa por aquí (evita IDOR)."""
 from __future__ import annotations
 
-from django.db.models import QuerySet
+from django.db.models import Q, QuerySet, Sum
+from django.utils import timezone
 from rest_framework.exceptions import NotFound
 
 from apps.accounts.models import Modulo, Tenant
@@ -73,6 +74,55 @@ def variante_get(*, tenant: Tenant, variante_id: int) -> Variante:
 def public_tenant(*, slug: str) -> Tenant | None:
     """Negocio por slug, INCLUYE suspendidos (la vista decide qué mostrar)."""
     return Tenant.objects.select_related("tema").filter(slug=slug).first()
+
+
+def items_agotados_hoy(*, tenant: Tenant) -> dict[int, bool]:
+    """Devuelve un dict {item_id: True} para los items del tenant que hoy alcanzaron
+    su límite diario de ventas.
+
+    Usa UNA sola query agregada (SUM de cantidad) filtrada por fecha local de hoy,
+    excluyendo pedidos cancelados. Solo evalúa items con ``limite_diario`` no nulo.
+    """
+    from django.db.models import IntegerField, OuterRef, Subquery
+    from apps.orders.models import PedidoItem  # import local para evitar ciclo
+
+    hoy = timezone.localdate()
+
+    # Items del tenant que tienen límite diario configurado.
+    items_con_limite = Item.all_objects.filter(
+        tenant=tenant,
+        limite_diario__isnull=False,
+    ).values("id", "limite_diario")
+
+    if not items_con_limite:
+        return {}
+
+    ids_con_limite = [row["id"] for row in items_con_limite]
+
+    # Suma de cantidades vendidas hoy por item, excluyendo pedidos cancelados.
+    vendidos_rows = (
+        PedidoItem.all_objects.filter(
+            item_id__in=ids_con_limite,
+            pedido__tenant=tenant,
+            pedido__creado__date=hoy,
+        )
+        .exclude(pedido__estado="cancelado")
+        .values("item_id")
+        .annotate(total_vendido=Sum("cantidad"))
+    )
+    vendidos: dict[int, int] = {
+        row["item_id"]: row["total_vendido"] for row in vendidos_rows
+    }
+
+    agotados: dict[int, bool] = {}
+    for row in items_con_limite:
+        item_id = row["id"]
+        limite = row["limite_diario"]
+        vendido = vendidos.get(item_id, 0)
+        if vendido >= limite:
+            agotados[item_id] = True
+
+    return agotados
 
 
 def public_colecciones_for(*, tenant: Tenant) -> list[Coleccion]:

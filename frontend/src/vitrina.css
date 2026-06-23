@@ -346,6 +346,9 @@
   display: flex; align-items: center; justify-content: center;
 }
 .v-add--label { width: auto; height: 40px; border-radius: 999px; padding: 0 18px 0 14px; gap: 5px; font-weight: 800; font-size: 15px; }
+.v-add--off { width: auto; height: auto; background: var(--rose-soft); color: var(--cocoa-mute); font-weight: 800; font-size: 13px; border-radius: 999px; padding: 8px 14px; cursor: default; }
+.v-mcard.is-sold, .v-prod.is-sold { opacity: 0.62; }
+.v-mtag--sold { background: #fdecec !important; color: #c0392b !important; }
 
 /* item detail bottom sheet */
 .v-sheet-overlay {

@@ -64,6 +64,15 @@ class Item(TenantModel):
     incluye = models.JSONField(
         default=list, blank=True, help_text='["Café", "Pan dulce", ...]'
     )
+    # Configurables por el dueño: tiempo de preparación y límite diario de ventas.
+    tiempo_preparacion = models.PositiveIntegerField(
+        null=True, blank=True,
+        help_text="Minutos para preparar este platillo",
+    )
+    limite_diario = models.PositiveIntegerField(
+        null=True, blank=True,
+        help_text="Máximo que se puede vender por día; null = sin límite",
+    )
     # Campos propios del catálogo (opcionales para menú)
     sku = models.CharField(max_length=60, blank=True)
     stock = models.IntegerField(

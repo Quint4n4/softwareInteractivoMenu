@@ -75,11 +75,14 @@ function QtyControl({ qty, onAdd, onDec, addLabel }: { qty: number; onAdd: () =>
 
 /* ---------------- Menu item card (cuadrícula) ---------------- */
 function ItemCard({ it, qty, onAdd, onDec, onOpen, ui }: { it: PubItem; qty: number; onAdd: () => void; onDec: () => void; onOpen: (it: PubItem) => void; ui: UIStrings }) {
+  const sold = it.agotado_hoy;
   return (
-    <div className="v-mcard" onClick={() => onOpen(it)}>
+    <div className={"v-mcard" + (sold ? " is-sold" : "")} onClick={() => { if (!sold) onOpen(it); }}>
       <div className="v-mthumb">
         {it.imagen ? <img src={mediaUrl(it.imagen) ?? ""} alt={it.nombre} /> : <Icon name={it.es_paquete ? "box" : "image"} size={26} />}
-        {it.es_paquete ? (
+        {sold ? (
+          <span className="v-mtag v-mtag--sold"><Icon name="alert" size={10} /> {ui.soldOut}</span>
+        ) : it.es_paquete ? (
           <span className="v-mtag"><Icon name="box" size={10} /> {ui.bundle}</span>
         ) : it.etiqueta ? (
           <span className="v-mtag">
@@ -92,7 +95,7 @@ function ItemCard({ it, qty, onAdd, onDec, onOpen, ui }: { it: PubItem; qty: num
         <div className="v-mname">{it.nombre}</div>
         <div className="v-mbot">
           <span className="v-mprice">{money(Number(it.precio), cur(it))}</span>
-          <QtyControl qty={qty} onAdd={onAdd} onDec={onDec} addLabel={ui.addBtn} />
+          {sold ? <span className="v-add v-add--off">{ui.soldOut}</span> : <QtyControl qty={qty} onAdd={onAdd} onDec={onDec} addLabel={ui.addBtn} />}
         </div>
       </div>
     </div>
@@ -417,7 +420,7 @@ function TrackingScreen({ order, onReorder, onTicket, ui }: { order: Pedido; onR
       <div className="v-eta">
         <div>
           <div className="v-eta__label">{ui.eta}</div>
-          <div className="v-eta__big">18 – 22 min</div>
+          <div className="v-eta__big">{order.eta_min || 15} – {(order.eta_min || 15) + 5} min</div>
           <div className="v-eta__meta">
             {order.numero} · {order.tipo === "mesa" ? `${ui.table} ${order.mesa_texto || "—"}` : ui.takeout} · {order.nombre_cliente}
           </div>
@@ -538,18 +541,19 @@ function ViewTabs({ vista, onVista, ui }: { vista: "menu" | "tienda"; onVista: (
 
 /* ---------------- Product card (grid, store mode) ---------------- */
 function ProductCard({ it, qty, onAdd, onDec, onOpen, ui }: { it: PubItem; qty: number; onAdd: () => void; onDec: () => void; onOpen: (it: PubItem) => void; ui: UIStrings }) {
+  const sold = it.agotado_hoy;
   return (
-    <div className="v-prod" onClick={() => onOpen(it)}>
+    <div className={"v-prod" + (sold ? " is-sold" : "")} onClick={() => { if (!sold) onOpen(it); }}>
       <div className="v-prod__thumb">
         {it.imagen ? <img src={mediaUrl(it.imagen) ?? ""} alt={it.nombre} /> : <Icon name="box" size={26} />}
-        {it.etiqueta && <span className="v-prod__tag">{ui.etiquetas[it.etiqueta] ?? it.etiqueta}</span>}
+        {sold ? <span className="v-prod__tag v-mtag--sold">{ui.soldOut}</span> : it.etiqueta && <span className="v-prod__tag">{ui.etiquetas[it.etiqueta] ?? it.etiqueta}</span>}
       </div>
       <div className="v-prod__body">
         <div className="v-prod__name">{it.nombre}</div>
         {it.descripcion && <div className="v-prod__desc">{it.descripcion}</div>}
         <div className="v-prod__bot">
           <span className="v-price">{money(Number(it.precio), cur(it))}</span>
-          <QtyControl qty={qty} onAdd={onAdd} onDec={onDec} addLabel={ui.addBtn} />
+          {sold ? <span className="v-add v-add--off">{ui.soldOut}</span> : <QtyControl qty={qty} onAdd={onAdd} onDec={onDec} addLabel={ui.addBtn} />}
         </div>
       </div>
     </div>
