@@ -1,4 +1,5 @@
-FROM node:20-alpine
+#FROM node:20-alpine se sustituye por debian para estabilidad en el proyecto 
+FROM node:20-bookworm-slim
 
 WORKDIR /app
 
